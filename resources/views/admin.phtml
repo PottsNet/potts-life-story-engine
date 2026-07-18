@@ -1,0 +1,97 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\ModulesTabsPage;
+use Fisharebest\Webtrees\I18N;
+
+/** @var string $title */
+/** @var string $version */
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), $title]]) ?>
+
+<h1><?= e($title) ?></h1>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h2 class="card-title mb-0"><?= I18N::translate('Recommended individual-page setup') ?></h2>
+    </div>
+    <div class="card-body">
+        <p>
+            <?= I18N::translate('Potts Biography is designed to be the main reading view for an individual, while the standard Facts and events tab remains the authoritative workspace for adding, editing and sourcing genealogy data.') ?>
+        </p>
+
+        <ol class="mb-4">
+            <li class="mb-2">
+                <strong><?= I18N::translate('Move Biography to the top of the tab list.') ?></strong>
+                <?= I18N::translate('This makes Biography the first tab displayed when visitors open an individual page.') ?>
+            </li>
+            <li class="mb-2">
+                <strong><?= I18N::translate('Keep Facts and events enabled.') ?></strong>
+                <?= I18N::translate('Editors and researchers should continue to use it to maintain the underlying facts, media, notes and sources.') ?>
+            </li>
+            <li class="mb-2">
+                <strong><?= I18N::translate('Consider disabling duplicate reading tabs.') ?></strong>
+                <?= I18N::translate('When Biography already presents ages and chapter media, you may choose to disable Potts Fact Ages and Album to simplify the visitor experience. This is optional.') ?>
+            </li>
+            <li class="mb-2">
+                <strong><?= I18N::translate('Keep event notes with the supporting fact.') ?></strong>
+                <?= I18N::translate('Short visible notes are shown with their event in Biography. Longer notes remain collapsed as research notes, while editing continues in Facts and events.') ?>
+            </li>
+            <li class="mb-2">
+                <strong><?= I18N::translate('Date media at the event where possible.') ?></strong>
+                <?= I18N::translate('Media attached to a dated fact inherits that date and age. Undated, unattached media remains visible in Photographs and keepsakes without an invented date.') ?>
+            </li>
+            <li class="mb-2">
+                <strong><?= I18N::translate('Set the name used in the story.') ?></strong>
+                <?= I18N::translate('Add an asterisk to the end of the given name the person was known by, for example Charles Henry Lyle* /Potts/. When no starred name is present, Biography uses NICK and then the first given name.') ?>
+            </li>
+        </ol>
+
+        <a class="btn btn-primary" href="<?= e(route(ModulesTabsPage::class)) ?>">
+            <?= I18N::translate('Open individual-page tab settings') ?>
+        </a>
+    </div>
+</div>
+
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h2 class="card-title mb-0"><?= I18N::translate('Preferred-name assistant') ?></h2>
+    </div>
+    <div class="card-body">
+        <p><?= I18N::translate('Biography uses the formal full name for the introduction, then switches to the name the person was normally known by.') ?></p>
+        <ol>
+            <li><strong><?= I18N::translate('Starred given name') ?>:</strong> <code>1 NAME Charles Henry Lyle* /Potts/</code></li>
+            <li><strong><?= I18N::translate('Nickname') ?>:</strong> <code>2 NICK Bill</code></li>
+            <li><strong><?= I18N::translate('Fallback') ?>:</strong> <?= I18N::translate('the first given name') ?></li>
+        </ol>
+        <p class="mb-0 text-muted"><?= I18N::translate('Names remain edited in webtrees. Open the individual, choose Edit, then Edit the raw GEDCOM when the normal form does not expose the preferred-name marker.') ?></p>
+    </div>
+</div>
+
+<div class="alert alert-info" role="status">
+    <strong><?= I18N::translate('Suggested order') ?>:</strong>
+    <?= I18N::translate('Biography first, Facts and events second, followed by any specialist research tabs you still use.') ?>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h2 class="card-title mb-0"><?= I18N::translate('Pre-release validation') ?></h2>
+    </div>
+    <div class="card-body">
+        <p><?= I18N::translate('This release candidate contains the complete 1.0 feature set. Please complete the final compatibility, privacy, performance and regression checks before publishing the stable release.') ?></p>
+        <ul class="mb-0">
+            <li><?= I18N::translate('Test biographies with few and many records.') ?></li>
+            <li><?= I18N::translate('Test logged-in and signed-out views.') ?></li>
+            <li><?= I18N::translate('Test Potts Modern Theme and at least one standard webtrees theme.') ?></li>
+            <li><?= I18N::translate('Report any fatal error, privacy issue, incorrect date or incorrect media placement before release.') ?></li>
+        </ul>
+    </div>
+</div>
+
+<p class="text-muted">
+    <?= I18N::translate('Installed module version: %s', e($version)) ?>
+</p>

@@ -1,0 +1,499 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\Age;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Media;
+use PottsLifeStoryEngine\EventClassifier;
+use PottsLifeStoryEngine\LifeStory;
+use PottsLifeStoryEngine\MediaRenderer;
+use PottsLifeStoryEngine\NameResolver;
+use PottsLifeStoryEngine\StoryChapter;
+use PottsLifeStoryEngine\StoryEvent;
+use PottsLifeStoryEngine\StoryGroup;
+
+/** @var EventClassifier $classifier */
+/** @var Individual $individual */
+/** @var LifeStory $story */
+/** @var NameResolver $nameResolver */
+
+$plain = static function (string $value): string {
+    $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    return trim((string) preg_replace('/\s+/u', ' ', strip_tags($value)));
+};
+
+$fullName = $nameResolver->formalName($individual);
+$nameParts = preg_split('/\s+/u', $fullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+$givenName = $nameResolver->narrativeName($individual);
+
+$mediaRenderer = new MediaRenderer();
+
+$renderMedia = static function (StoryEvent $event) use ($plain, $mediaRenderer, $givenName, $individual): void {
+    $fact  = $event->fact;
+    $media = $event->media ?? $fact->target();
+    $title = $plain($fact->value());
+
+    // The resolver normally supplies the authoritative media date and age.
+    // As a final safety net, retain the date of the actual fact that owns the
+    // media whenever that context was lost during grouping or de-duplication.
+    $mediaYear = $event->mediaEffectiveYear;
+    $mediaAge = $event->mediaAge;
+    if ($mediaYear === null && $fact->date()->isOK()) {
+        $candidateYear = $fact->date()->minimumDate()->year();
+        if ($candidateYear > 0) {
+            $mediaYear = $candidateYear;
+        }
+    }
+    if ($mediaAge === null && $fact->date()->isOK() && $individual->getBirthDate()->isOK()) {
+        $age = new Age($individual->getBirthDate(), $fact->date());
+        $years = $age->ageYears();
+        if ($years >= 0 && $years < 130) {
+            $mediaAge = $years;
+        }
+    }
+
+    if ($media instanceof Media) {
+        $title = $plain($media->fullName()) ?: $title;
+        echo $mediaRenderer->render($media, $title, $event->mediaKind, $event->icon, $mediaYear, $mediaAge, $givenName);
+        return;
+    }
+
+    ?>
+    <article class="potts-story-media-record">
+        <span aria-hidden="true"><?= e($event->icon) ?></span>
+        <div>
+            <strong><?= e($fact->label()) ?></strong>
+            <?php if ($title !== '' && $title !== 'Y') : ?><p><?= e($title) ?></p><?php endif ?>
+        </div>
+    </article>
+    <?php
+};
+
+
+$renderNotes = static function (StoryEvent $event): void {
+    if ($event->notes === []) {
+        return;
+    }
+
+    $shortNotes = array_values(array_filter($event->notes, static fn ($note): bool => !$note->isLong));
+    $longNotes = array_values(array_filter($event->notes, static fn ($note): bool => $note->isLong));
+    $fact = $event->fact;
+    ?>
+    <div class="potts-story-event__notes" aria-label="<?= e(I18N::translate('Research notes')) ?>">
+        <?php if ($shortNotes !== []) : ?>
+            <aside class="potts-story-event__note potts-story-event__note--inline">
+                <p class="potts-story-event__note-label"><?= I18N::plural('From the record', 'From the records', count($shortNotes)) ?></p>
+                <?php foreach ($shortNotes as $note) : ?>
+                    <div class="potts-story-event__note-content">
+                        <?= view('fact-gedcom-fields', ['gedcom' => $note->gedcom, 'parent' => $fact->tag(), 'tree' => $fact->record()->tree()]) ?>
+                    </div>
+                <?php endforeach ?>
+            </aside>
+        <?php endif ?>
+
+        <?php if ($longNotes !== []) : ?>
+            <details class="potts-story-event__note potts-story-event__note--details">
+                <summary><?= I18N::plural('%s research note', '%s research notes', count($longNotes), I18N::number(count($longNotes))) ?></summary>
+                <div class="potts-story-event__note-expanded">
+                    <?php foreach ($longNotes as $note) : ?>
+                        <div class="potts-story-event__note-content">
+                            <?= view('fact-gedcom-fields', ['gedcom' => $note->gedcom, 'parent' => $fact->tag(), 'tree' => $fact->record()->tree()]) ?>
+                        </div>
+                    <?php endforeach ?>
+                </div>
+            </details>
+        <?php endif ?>
+    </div>
+    <?php
+};
+
+$renderEvent = static function (StoryEvent $event) use ($plain, $renderMedia, $renderNotes, $individual): void {
+    if ($event->isMedia) {
+        $renderMedia($event);
+        return;
+    }
+
+    $fact = $event->fact;
+    $date = $fact->date();
+    $place = trim($fact->place()->gedcomName());
+    $value = $plain($fact->value());
+    $ageText = '';
+    if ($event->type !== 'BIRT' && $individual->getBirthDate()->isOK() && $date->isOK()) {
+        $age = new Age($individual->getBirthDate(), $date);
+        $years = $age->ageYears();
+        if ($years >= 0 && $years < 130) {
+            $ageText = $years === 0
+                ? I18N::translate('During the first year of life')
+                : I18N::plural('About %s year old', 'About %s years old', $years, I18N::number($years));
+        }
+    }
+    ?>
+    <article class="potts-story-event potts-story-event--<?= e($event->importance) ?> potts-story-event--<?= e($event->accent) ?>">
+        <div class="potts-story-event__marker" aria-hidden="true"><?= e($event->icon) ?></div>
+        <div class="potts-story-event__body">
+            <div class="potts-story-event__heading">
+                <div class="potts-story-event__title-wrap">
+                    <h4><?= e($fact->label()) ?></h4>
+                    <?php if ($event->importance === 'major') : ?>
+                        <span class="potts-story-event__key-moment"><?= I18N::translate('Key moment') ?></span>
+                    <?php endif ?>
+                </div>
+                <?php if ($date->isOK()) : ?>
+                    <time><?= $date->display() ?></time>
+                <?php endif ?>
+            </div>
+            <?php if ($ageText !== '') : ?>
+                <p class="potts-story-event__age"><?= e($ageText) ?></p>
+            <?php endif ?>
+            <?php if ($value !== '' && $value !== 'Y') : ?>
+                <p class="potts-story-event__value"><?= e($value) ?></p>
+            <?php endif ?>
+            <?php if ($place !== '') : ?>
+                <p class="potts-story-event__place"><?= e($place) ?></p>
+            <?php endif ?>
+            <?php $renderNotes($event) ?>
+        </div>
+    </article>
+    <?php
+};
+?>
+
+<section class="potts-life-story" aria-label="<?= e(I18N::translate('Biography')) ?>">
+    <header class="potts-life-story__intro">
+        <h2><?= I18N::translate('The life of %s', e($fullName)) ?></h2>
+        <p class="potts-life-story__record-count"><?= I18N::plural('%s documented event', '%s documented events', $story->eventCount(), I18N::number($story->eventCount())) ?></p>
+        <?php if ($story->profile !== null) : ?>
+            <p class="potts-life-story__profile"><span><?= I18N::translate('Story focus') ?></span><?= e($story->profile->label) ?></p>
+        <?php endif ?>
+        <?php if ($story->introduction !== '') : ?>
+            <p class="potts-life-story__biography"><?= e($story->introduction) ?></p>
+        <?php endif ?>
+
+        <?php if ($story->coverQuote !== '') : ?>
+            <blockquote class="potts-life-story__quote">
+                <p><?= e($story->coverQuote) ?></p>
+                <cite><?= I18N::translate('From the family record') ?></cite>
+            </blockquote>
+        <?php endif ?>
+
+        <?php if ($story->milestones !== []) : ?>
+            <nav class="potts-life-story__milestones" aria-label="<?= e(I18N::translate('Life milestones')) ?>">
+                <?php foreach ($story->milestones as $milestone) : ?>
+                    <a href="#potts-story-<?= e($milestone['chapter']) ?>">
+                        <?php if ($milestone['year'] !== '') : ?><span><?= e($milestone['year']) ?></span><?php endif ?>
+                        <strong><?= e($milestone['label']) ?></strong>
+                    </a>
+                <?php endforeach ?>
+            </nav>
+        <?php endif ?>
+
+        <?php if ($story->highlights !== []) : ?>
+            <aside class="potts-life-story__highlights" aria-label="<?= e(I18N::translate('At a glance')) ?>">
+                <p class="potts-life-story__highlights-title"><?= I18N::translate('At a glance') ?></p>
+                <ul>
+                    <?php foreach ($story->highlights as $highlight) : ?>
+                        <li><?= e($highlight) ?></li>
+                    <?php endforeach ?>
+                </ul>
+            </aside>
+        <?php endif ?>
+
+        <?php if ($story->turningPoints !== []) : ?>
+            <section class="potts-life-story__turning-points" aria-labelledby="potts-turning-points-title">
+                <header>
+                    <p id="potts-turning-points-title"><?= I18N::translate('Turning points') ?></p>
+                    <span><?= I18N::translate('The moments that changed the direction of this life') ?></span>
+                </header>
+                <ol>
+                    <?php foreach ($story->turningPoints as $turningPoint) : ?>
+                        <li class="potts-life-story__turning-point potts-life-story__turning-point--<?= e($turningPoint['accent']) ?>">
+                            <a href="#potts-story-<?= e($turningPoint['chapter']) ?>">
+                                <?php if ($turningPoint['year'] !== '') : ?><time><?= e($turningPoint['year']) ?></time><?php endif ?>
+                                <strong><?= e($turningPoint['title']) ?></strong>
+                                <span><?= e($turningPoint['summary']) ?></span>
+                            </a>
+                        </li>
+                    <?php endforeach ?>
+                </ol>
+            </section>
+        <?php endif ?>
+
+        <?php if ($story->historicalContext !== []) : ?>
+            <?php
+            $visibleContext = array_slice($story->historicalContext, 0, 3);
+            $extraContext = array_slice($story->historicalContext, 3);
+            $historyFollowsCountries = count(array_filter($story->historicalContext, static fn ($context): bool => $context->countryName !== '')) > 0;
+            ?>
+            <aside class="potts-life-story__history" aria-label="<?= e(I18N::translate('Historical context')) ?>">
+                <div class="potts-life-story__history-heading">
+                    <p><?= I18N::translate('The world during %s’s lifetime', e($givenName)) ?></p>
+                    <span><?= $historyFollowsCountries
+                        ? I18N::translate('Historical events follow the countries recorded across this life')
+                        : I18N::translate('Historical events follow the collections selected for this site or visitor') ?></span>
+                </div>
+                <ol>
+                    <?php foreach ($visibleContext as $context) : ?>
+                        <li>
+                            <time><?= e($context->date) ?></time>
+                            <div>
+                                <?php if ($context->countryName !== '' || $context->category !== '') : ?>
+                                    <small class="potts-life-story__history-context">
+                                        <?php if ($context->countryName !== '') : ?><b><?= e($context->countryName) ?></b><?php endif ?>
+                                        <?php if ($context->countryName !== '' && $context->category !== '') : ?> · <?php endif ?>
+                                        <?php if ($context->category !== '') : ?><?= e($context->category) ?><?php endif ?>
+                                    </small>
+                                <?php endif ?>
+                                <p><?= e($context->text) ?></p>
+                                <?php if ($context->age !== null) : ?><span><?= I18N::translate('%s was about %s when this happened.', e($givenName), I18N::number($context->age)) ?></span><?php endif ?>
+                                <?php if ($context->url !== '') : ?><a href="<?= e($context->url) ?>" target="_blank" rel="noopener noreferrer"><?= I18N::translate('Source') ?></a><?php endif ?>
+                            </div>
+                        </li>
+                    <?php endforeach ?>
+                </ol>
+
+                <?php if ($extraContext !== []) : ?>
+                    <details class="potts-life-story__history-more">
+                        <summary><?= I18N::plural('View %s more historical event', 'View %s more historical events', count($extraContext), I18N::number(count($extraContext))) ?></summary>
+                        <ol>
+                            <?php foreach ($extraContext as $context) : ?>
+                                <li>
+                                    <time><?= e($context->date) ?></time>
+                                    <div>
+                                        <?php if ($context->countryName !== '' || $context->category !== '') : ?>
+                                    <small class="potts-life-story__history-context">
+                                        <?php if ($context->countryName !== '') : ?><b><?= e($context->countryName) ?></b><?php endif ?>
+                                        <?php if ($context->countryName !== '' && $context->category !== '') : ?> · <?php endif ?>
+                                        <?php if ($context->category !== '') : ?><?= e($context->category) ?><?php endif ?>
+                                    </small>
+                                <?php endif ?>
+                                        <p><?= e($context->text) ?></p>
+                                        <?php if ($context->age !== null) : ?><span><?= I18N::translate('%s was about %s when this happened.', e($givenName), I18N::number($context->age)) ?></span><?php endif ?>
+                                        <?php if ($context->url !== '') : ?><a href="<?= e($context->url) ?>" target="_blank" rel="noopener noreferrer"><?= I18N::translate('Source') ?></a><?php endif ?>
+                                    </div>
+                                </li>
+                            <?php endforeach ?>
+                        </ol>
+                    </details>
+                <?php endif ?>
+
+                <p class="potts-life-story__history-credit"><?= I18N::translate('Historical context supplied by Potts Historical Facts.') ?></p>
+            </aside>
+        <?php endif ?>
+    </header>
+
+    <nav class="potts-life-story__chapter-nav" aria-label="<?= e(I18N::translate('Biography chapters')) ?>">
+        <?php foreach ($story->chapters as $chapterData) : ?>
+            <?php /** @var StoryChapter $chapterData */ ?>
+            <a href="#potts-story-<?= e($chapterData->key) ?>"><?= e($chapterData->title) ?></a>
+        <?php endforeach ?>
+    </nav>
+
+    <?php foreach ($story->chapters as $chapter => $chapterData) : ?>
+        <?php /** @var StoryChapter $chapterData */ ?>
+        <section id="potts-story-<?= e($chapterData->key) ?>" class="potts-story-chapter potts-story-chapter--<?= e($chapter) ?>">
+            <?php if ($chapterData->transition !== '') : ?>
+                <p class="potts-story-chapter__transition"><?= e($chapterData->transition) ?></p>
+            <?php endif ?>
+            <header class="potts-story-chapter__header">
+                <span class="potts-story-chapter__line" aria-hidden="true"></span>
+                <div>
+                    <p class="potts-story-chapter__stage"><?= e($chapterData->stageLabel) ?></p>
+                    <h3><?= e($chapterData->title) ?></h3>
+                    <p class="potts-story-chapter__count"><?= I18N::plural('%s supporting event', '%s supporting events', $chapterData->eventCount(), I18N::number($chapterData->eventCount())) ?></p>
+                    <?php if ($chapterData->subtitle !== '') : ?>
+                        <p class="potts-story-chapter__subtitle"><?= e($chapterData->subtitle) ?></p>
+                    <?php endif ?>
+                </div>
+            </header>
+
+            <?php if ($chapterData->narrative !== '') : ?>
+                <div class="potts-story-chapter__opening">
+                    <p class="potts-story-chapter__narrative"><?= e($chapterData->narrative) ?></p>
+                </div>
+            <?php endif ?>
+
+            <?php
+            // 0.9.0-alpha.3: curate each chapter like a published story.
+            // Illustrations come immediately after the narrative, followed by
+            // the key events and then the expandable supporting records.
+            $chapterMediaItems = $chapterData->items->filter(static function ($item): bool {
+                return $item instanceof StoryGroup
+                    && (str_starts_with($item->key, 'illustrations-') || $item->key === 'memories');
+            })->values();
+            $chapterRecordItems = $chapterData->items->reject(static function ($item): bool {
+                return $item instanceof StoryGroup
+                    && (str_starts_with($item->key, 'illustrations-') || $item->key === 'memories');
+            })->values();
+            $chapterItems = $chapterMediaItems->concat($chapterRecordItems);
+            ?>
+            <div class="potts-story-events">
+                <?php $shownRecordDivider = false; ?>
+                <?php foreach ($chapterItems as $item) : ?>
+                    <?php
+                    $itemIsMediaGroup = $item instanceof StoryGroup
+                        && (str_starts_with($item->key, 'illustrations-') || $item->key === 'memories');
+                    if (!$itemIsMediaGroup && !$shownRecordDivider && $chapterMediaItems->isNotEmpty()) :
+                        $shownRecordDivider = true;
+                    ?>
+                        <div class="potts-story-chapter__supporting-heading">
+                            <span aria-hidden="true"></span>
+                            <h4><?= I18N::translate('Key events and supporting records') ?></h4>
+                        </div>
+                    <?php endif ?>
+                    <?php if ($item instanceof StoryGroup) : ?>
+                        <?php $isIllustrationGroup = str_starts_with($item->key, 'illustrations-') || $item->key === 'memories'; ?>
+                        <?php if ($isIllustrationGroup) : ?>
+                            <?php
+                            // Resolve the chapter media into three deliberate groups:
+                            // photographs, documentary records and title-only references.
+                            $visualMediaEvents = $item->events->filter(static function (StoryEvent $event): bool {
+                                $target = $event->media ?? $event->fact->target();
+                                return $target instanceof Media && !$target->mediaFiles()->isEmpty();
+                            })->values();
+                            $photoEvents = $visualMediaEvents
+                                ->filter(static fn (StoryEvent $event): bool => $event->mediaKind === 'photograph')
+                                ->sortByDesc(static function (StoryEvent $event): int {
+                                    // Prefer an explicitly/closely matched event image as the
+                                    // chapter hero, then placement confidence and importance.
+                                    return ($event->mediaMatchedEventLabel !== '' ? 1000 : 0)
+                                        + ($event->mediaMatchedEventYear !== null ? 250 : 0)
+                                        + ($event->mediaConfidence * 5)
+                                        + $event->score;
+                                })
+                                ->values();
+                            $documentEvents = $visualMediaEvents
+                                ->reject(static fn (StoryEvent $event): bool => $event->mediaKind === 'photograph')
+                                ->sortByDesc(static function (StoryEvent $event): int {
+                                    return ($event->mediaMatchedEventLabel !== '' ? 500 : 0)
+                                        + ($event->mediaConfidence * 5)
+                                        + $event->score;
+                                })
+                                ->values();
+                            $recordOnlyEvents = $item->events->reject(static function (StoryEvent $event): bool {
+                                $target = $event->media ?? $event->fact->target();
+                                return $target instanceof Media && !$target->mediaFiles()->isEmpty();
+                            })->values();
+
+                            $featuredPhoto = $photoEvents->first();
+                            $supportingPhotos = $photoEvents->slice($featuredPhoto instanceof StoryEvent ? 1 : 0);
+                            $visiblePhotos = $supportingPhotos->take(3);
+                            $extraPhotos = $supportingPhotos->slice(3);
+                            $visibleDocuments = $documentEvents->take(3);
+                            $extraDocuments = $documentEvents->slice(3);
+                            ?>
+                            <section class="potts-story-gallery potts-story-gallery--curated" aria-label="<?= e($item->title) ?>">
+                                <header>
+                                    <div>
+                                        <h4><?= e($item->title) ?></h4>
+                                        <p><?= e($item->summary) ?></p>
+                                    </div>
+                                    <span><?= I18N::plural('%s item', '%s items', $item->count(), I18N::number($item->count())) ?></span>
+                                </header>
+
+                                <?php if ($featuredPhoto instanceof StoryEvent) : ?>
+                                    <div class="potts-story-gallery__featured" aria-label="<?= e(I18N::translate('Featured photograph')) ?>">
+                                        <?php $renderMedia($featuredPhoto) ?>
+                                    </div>
+                                <?php endif ?>
+
+                                <?php if ($visiblePhotos->isNotEmpty()) : ?>
+                                    <section class="potts-story-gallery__section">
+                                        <h5><?= I18N::translate('Photographs') ?></h5>
+                                        <div class="potts-story-gallery__grid potts-story-gallery__grid--supporting">
+                                            <?php foreach ($visiblePhotos as $event) : ?>
+                                                <?php $renderMedia($event) ?>
+                                            <?php endforeach ?>
+                                        </div>
+                                    </section>
+                                <?php endif ?>
+
+                                <?php if ($extraPhotos->isNotEmpty()) : ?>
+                                    <details class="potts-story-gallery__more">
+                                        <summary><?= I18N::plural('View %s more photograph', 'View %s more photographs', $extraPhotos->count(), I18N::number($extraPhotos->count())) ?></summary>
+                                        <div class="potts-story-gallery__grid potts-story-gallery__grid--supporting">
+                                            <?php foreach ($extraPhotos as $event) : ?>
+                                                <?php $renderMedia($event) ?>
+                                            <?php endforeach ?>
+                                        </div>
+                                    </details>
+                                <?php endif ?>
+
+                                <?php if ($visibleDocuments->isNotEmpty()) : ?>
+                                    <section class="potts-story-gallery__section potts-story-gallery__section--records">
+                                        <h5><?= I18N::translate('Documents and records') ?></h5>
+                                        <div class="potts-story-gallery__grid potts-story-gallery__grid--documents">
+                                            <?php foreach ($visibleDocuments as $event) : ?>
+                                                <?php $renderMedia($event) ?>
+                                            <?php endforeach ?>
+                                        </div>
+                                    </section>
+                                <?php endif ?>
+
+                                <?php if ($extraDocuments->isNotEmpty()) : ?>
+                                    <details class="potts-story-gallery__more">
+                                        <summary><?= I18N::plural('View %s more record', 'View %s more records', $extraDocuments->count(), I18N::number($extraDocuments->count())) ?></summary>
+                                        <div class="potts-story-gallery__grid potts-story-gallery__grid--documents">
+                                            <?php foreach ($extraDocuments as $event) : ?>
+                                                <?php $renderMedia($event) ?>
+                                            <?php endforeach ?>
+                                        </div>
+                                    </details>
+                                <?php endif ?>
+
+                                <?php if ($recordOnlyEvents->isNotEmpty()) : ?>
+                                    <details class="potts-story-gallery__records"<?= $visualMediaEvents->isEmpty() ? ' open' : '' ?>>
+                                        <summary><?= I18N::plural('%s related media record', '%s related media records', $recordOnlyEvents->count(), I18N::number($recordOnlyEvents->count())) ?></summary>
+                                        <div class="potts-story-gallery__record-list">
+                                            <?php foreach ($recordOnlyEvents as $event) : ?>
+                                                <?php $renderMedia($event) ?>
+                                            <?php endforeach ?>
+                                        </div>
+                                    </details>
+                                <?php endif ?>
+                            </section>
+                        <?php else : ?>
+                            <details class="potts-story-group potts-story-group--<?= e($item->accent) ?>">
+                                <summary>
+                                    <span class="potts-story-group__icon" aria-hidden="true"><?= e($item->icon) ?></span>
+                                    <span class="potts-story-group__heading">
+                                        <strong><?= e($item->title) ?></strong>
+                                        <small><?= e($item->summary) ?></small>
+                                        <?php if ($item->featuredEvent instanceof StoryEvent) : ?>
+                                            <?php
+                                            $featuredFact = $item->featuredEvent->fact;
+                                            $featuredValue = $plain($featuredFact->value());
+                                            $featuredPlace = trim($featuredFact->place()->gedcomName());
+                                            ?>
+                                            <span class="potts-story-group__featured">
+                                                <b><?= I18N::translate('Story highlight') ?></b>
+                                                <?= e($featuredFact->label()) ?>
+                                                <?php if ($featuredValue !== '' && $featuredValue !== 'Y') : ?> · <?= e($featuredValue) ?><?php endif ?>
+                                                <?php if ($featuredPlace !== '') : ?> · <?= e($featuredPlace) ?><?php endif ?>
+                                            </span>
+                                        <?php endif ?>
+                                        <em><?= I18N::translate('View the supporting records') ?></em>
+                                    </span>
+                                    <span class="potts-story-group__count"><?= I18N::number($item->count()) ?></span>
+                                </summary>
+                                <div class="potts-story-group__events">
+                                    <?php foreach ($item->events as $event) : ?>
+                                        <?php $renderEvent($event) ?>
+                                    <?php endforeach ?>
+                                </div>
+                            </details>
+                        <?php endif ?>
+                    <?php else : ?>
+                        <?php $renderEvent($item) ?>
+                    <?php endif ?>
+                <?php endforeach ?>
+            </div>
+        </section>
+    <?php endforeach ?>
+
+    <footer class="potts-life-story__research-link">
+        <p><?= I18N::translate('This biography is created from the underlying genealogical records.') ?></p>
+        <p><?= I18N::translate('To add or edit genealogical information, select the Facts and events tab near the top of this page.') ?></p>
+    </footer>
+</section>

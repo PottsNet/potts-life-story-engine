@@ -1,0 +1,2156 @@
+.potts-life-story {
+    --pls-ink: #24343a;
+    --pls-muted: #64777c;
+    --pls-line: #d8e0dd;
+    --pls-paper: #fffefb;
+    color: var(--pls-ink);
+    max-width: 980px;
+    margin-inline: auto;
+}
+
+.potts-life-story__intro {
+    padding: clamp(1.25rem, 3vw, 2rem);
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(70, 92, 88, .14);
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(247,243,233,.92));
+    box-shadow: 0 12px 32px rgba(34, 49, 53, .08);
+}
+
+.potts-life-story__intro h2 { margin: .15rem 0 .5rem; font-size: clamp(1.55rem, 3vw, 2.35rem); }
+.potts-life-story__intro p:last-child { margin: 0; color: var(--pls-muted); }
+.potts-life-story__eyebrow,
+.potts-story-chapter__number {
+    margin: 0;
+    color: #9a6e19;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.potts-story-chapter { margin: 1.5rem 0 2.25rem; }
+.potts-story-chapter__header { display: flex; gap: 1rem; align-items: center; margin-bottom: .9rem; }
+.potts-story-chapter__line { width: 3rem; height: 3px; border-radius: 99px; background: linear-gradient(90deg, #0d6778, #c19431); }
+.potts-story-chapter__header h3 { margin: .1rem 0 0; font-size: clamp(1.15rem, 2vw, 1.5rem); }
+
+.potts-story-events { position: relative; display: grid; gap: .75rem; padding-left: 1.15rem; }
+.potts-story-events::before { content: ""; position: absolute; left: .32rem; top: .9rem; bottom: .9rem; width: 2px; background: var(--pls-line); }
+
+.potts-story-event {
+    --event-accent: #6f8589;
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: .75rem;
+    padding: .95rem 1rem .95rem .55rem;
+    border: 1px solid rgba(75, 94, 95, .14);
+    border-left: 4px solid var(--event-accent);
+    border-radius: .8rem;
+    background: var(--pls-paper);
+    box-shadow: 0 5px 16px rgba(40, 55, 58, .055);
+}
+.potts-story-event--major { padding-block: 1.15rem; box-shadow: 0 8px 22px rgba(40,55,58,.08); }
+.potts-story-event--minor { background: rgba(255,255,255,.72); box-shadow: none; }
+.potts-story-event--birth { --event-accent: #6b9468; }
+.potts-story-event--family { --event-accent: #4d82a8; }
+.potts-story-event--career { --event-accent: #bf8a23; }
+.potts-story-event--education { --event-accent: #7967a5; }
+.potts-story-event--journey { --event-accent: #278997; }
+.potts-story-event--place { --event-accent: #7b9294; }
+.potts-story-event--property { --event-accent: #927052; }
+.potts-story-event--service { --event-accent: #73805c; }
+.potts-story-event--community { --event-accent: #6d829d; }
+.potts-story-event--final { --event-accent: #8c7564; }
+.potts-story-event--death { --event-accent: #4d585d; }
+
+.potts-story-event__marker {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid white;
+    border-radius: 50%;
+    background: var(--event-accent);
+    color: white;
+    font-size: .72rem;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--event-accent) 35%, transparent);
+}
+.potts-story-event__heading { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+.potts-story-event__heading h4 { margin: 0; font-size: 1rem; }
+.potts-story-event__heading time { color: #8c681f; font-weight: 700; text-align: right; }
+.potts-story-event__value { margin: .35rem 0 0; font-weight: 650; }
+.potts-story-event__place { margin: .2rem 0 0; color: var(--pls-muted); }
+
+
+@media (min-width: 601px) and (max-width: 900px) {
+    .potts-life-story__chapter-nav a {
+        flex: 1 1 calc(33.333% - .45rem);
+        text-align: center;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 600px) {
+    .potts-story-event__heading { display: block; }
+    .potts-story-event__heading time { display: block; margin-top: .15rem; text-align: left; }
+    .potts-story-events { padding-left: .75rem; }
+}
+
+.potts-story-chapter__narrative {
+    max-width: 70ch;
+    margin: -.25rem 0 1rem 4rem;
+    color: var(--pls-muted);
+    line-height: 1.6;
+}
+
+.potts-story-group {
+    --event-accent: #6f8589;
+    border: 1px solid rgba(75, 94, 95, .16);
+    border-left: 4px solid var(--event-accent);
+    border-radius: .9rem;
+    background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(247,248,246,.9));
+    box-shadow: 0 8px 24px rgba(40,55,58,.065);
+    overflow: hidden;
+}
+.potts-story-group--career { --event-accent: #bf8a23; }
+.potts-story-group--place { --event-accent: #7b9294; }
+.potts-story-group--education { --event-accent: #7967a5; }
+.potts-story-group--service { --event-accent: #73805c; }
+
+.potts-story-group > summary {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0,1fr) auto;
+    align-items: center;
+    gap: .8rem;
+    padding: 1rem;
+    cursor: pointer;
+    list-style: none;
+}
+.potts-story-group > summary::-webkit-details-marker { display: none; }
+.potts-story-group > summary:hover { background: color-mix(in srgb, var(--event-accent) 7%, white); }
+.potts-story-group__icon {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--event-accent);
+    color: white;
+    font-size: .75rem;
+}
+.potts-story-group__heading { display: grid; gap: .2rem; }
+.potts-story-group__heading strong { font-size: 1.05rem; }
+.potts-story-group__heading small { color: var(--pls-muted); line-height: 1.45; }
+.potts-story-group__count {
+    min-width: 2rem;
+    padding: .3rem .55rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--event-accent) 12%, white);
+    color: var(--event-accent);
+    font-weight: 800;
+    text-align: center;
+}
+.potts-story-group__events {
+    display: grid;
+    gap: .65rem;
+    padding: 0 .8rem .8rem 2.9rem;
+    border-top: 1px solid rgba(75,94,95,.12);
+}
+.potts-story-group__events .potts-story-event {
+    margin-top: .75rem;
+    box-shadow: none;
+}
+
+@media (max-width: 600px) {
+    .potts-story-chapter__narrative { margin-left: 0; }
+    .potts-story-group > summary { grid-template-columns: 2.25rem minmax(0,1fr); }
+    .potts-story-group__count { display: none; }
+    .potts-story-group__events { padding-left: .65rem; }
+}
+
+/* Narrative release */
+.potts-life-story__biography {
+    max-width: 48rem;
+    margin: 1rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: color-mix(in srgb, currentColor 82%, transparent);
+}
+
+.potts-story-chapter__narrative {
+    font-size: .98rem;
+    line-height: 1.65;
+}
+
+.potts-story-group__heading small {
+    line-height: 1.5;
+}
+
+/* 0.4.0 narrative navigation and highlights */
+.potts-life-story__milestones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+    gap: .55rem;
+    margin-top: 1.25rem;
+}
+.potts-life-story__milestones a {
+    position: relative;
+    display: grid;
+    gap: .1rem;
+    min-height: 4.1rem;
+    padding: .65rem .7rem .65rem 1rem;
+    border: 1px solid rgba(75,94,95,.13);
+    border-radius: .75rem;
+    background: rgba(255,255,255,.72);
+    color: inherit;
+    text-decoration: none;
+}
+.potts-life-story__milestones a::before {
+    content: "";
+    position: absolute;
+    left: .45rem;
+    top: .75rem;
+    bottom: .75rem;
+    width: 3px;
+    border-radius: 99px;
+    background: linear-gradient(#0d6778, #c19431);
+}
+.potts-life-story__milestones a:hover { background: white; box-shadow: 0 5px 16px rgba(40,55,58,.08); }
+.potts-life-story__milestones span { color: #9a6e19; font-size: .78rem; font-weight: 800; }
+.potts-life-story__milestones strong { font-size: .88rem; line-height: 1.2; }
+
+.potts-life-story__highlights {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .85rem;
+    margin-top: 1rem;
+    padding: .85rem 1rem;
+    border: 1px solid rgba(166,127,47,.2);
+    border-radius: .8rem;
+    background: linear-gradient(135deg, rgba(255,250,236,.95), rgba(255,255,255,.92));
+}
+.potts-life-story__highlights-title {
+    margin: 0;
+    color: #8b671c;
+    font-weight: 800;
+    white-space: nowrap;
+}
+.potts-life-story__highlights ul {
+    display: grid;
+    gap: .25rem;
+    margin: 0;
+    padding-left: 1.1rem;
+}
+
+.potts-life-story__chapter-nav {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .45rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 1.25rem;
+    padding: .55rem;
+    overflow: visible;
+    border: 1px solid rgba(75,94,95,.12);
+    border-radius: .8rem;
+    background: color-mix(in srgb, white 96%, transparent);
+    box-shadow: 0 5px 18px rgba(40,55,58,.06);
+}
+.potts-life-story__chapter-nav a {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: .4rem .7rem;
+    border-radius: 999px;
+    background: rgba(13,103,120,.06);
+    color: inherit;
+    font-size: .84rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+.potts-life-story__chapter-nav a:hover { background: rgba(13,103,120,.13); }
+.potts-story-chapter { scroll-margin-top: 5rem; }
+.potts-story-event--memory { --event-accent: #9b7454; }
+.potts-story-group--memory { --event-accent: #9b7454; }
+.potts-story-group__heading em {
+    color: var(--event-accent);
+    font-size: .76rem;
+    font-style: normal;
+    font-weight: 750;
+}
+.potts-story-group[open] .potts-story-group__heading em { display: none; }
+
+@media (max-width: 600px) {
+    .potts-life-story__highlights { grid-template-columns: 1fr; }
+    .potts-life-story__milestones { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .potts-life-story__chapter-nav {
+        gap: .35rem;
+        padding: .45rem;
+    }
+    .potts-life-story__chapter-nav a {
+        flex: 1 1 calc(50% - .35rem);
+        text-align: center;
+        white-space: normal;
+    }
+}
+
+/* 0.5.0 narrative composer */
+.potts-life-story__record-count {
+    margin: 0;
+    color: var(--pls-muted);
+    font-size: .85rem;
+    font-weight: 650;
+}
+.potts-life-story__biography {
+    font-size: clamp(1.02rem, 1.4vw, 1.12rem);
+    line-height: 1.8;
+}
+.potts-story-chapter__narrative {
+    color: color-mix(in srgb, var(--pls-ink) 72%, transparent);
+}
+.potts-story-group__heading em {
+    color: color-mix(in srgb, var(--event-accent) 78%, #344);
+    font-size: .78rem;
+    font-style: normal;
+    font-weight: 700;
+}
+
+
+/* Historical context integration */
+.potts-life-story__history {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--bs-border-color, #d9d9d9) 78%, #b78b3e);
+    border-radius: 1rem;
+    background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(250,246,236,.92));
+}
+.potts-life-story__history-heading {
+    display: flex;
+    gap: .75rem 1.25rem;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+.potts-life-story__history-heading p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 750;
+}
+.potts-life-story__history-heading span {
+    color: var(--bs-secondary-color, #667085);
+    font-size: .88rem;
+}
+.potts-life-story__history ol {
+    display: grid;
+    gap: .85rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.potts-life-story__history li {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, 8rem) 1fr;
+    gap: 1rem;
+    padding: .8rem 0;
+    border-top: 1px solid rgba(120,95,48,.16);
+}
+.potts-life-story__history li:first-child { border-top: 0; }
+.potts-life-story__history time {
+    color: #8b642e;
+    font-weight: 750;
+}
+.potts-life-story__history small {
+    display: block;
+    margin-bottom: .2rem;
+    color: #8b642e;
+    font-size: .72rem;
+    font-weight: 750;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.potts-life-story__history li p { margin: 0 0 .25rem; }
+.potts-life-story__history li span,
+.potts-life-story__history li a {
+    margin-right: .75rem;
+    font-size: .82rem;
+}
+.potts-life-story__history-credit {
+    margin: 1rem 0 0;
+    color: var(--bs-secondary-color, #667085);
+    font-size: .78rem;
+}
+@media (max-width: 640px) {
+    .potts-life-story__history-heading,
+    .potts-life-story__history li { display: block; }
+    .potts-life-story__history-heading span { display: block; margin-top: .25rem; }
+    .potts-life-story__history time { display: block; margin-bottom: .35rem; }
+}
+
+/* Historical context refinement – 0.6.0-alpha.2 */
+.potts-life-story__history-more {
+    margin-top: .75rem;
+    border-top: 1px solid rgba(120,95,48,.16);
+}
+.potts-life-story__history-more > summary {
+    cursor: pointer;
+    padding: .85rem 0 .15rem;
+    color: #795827;
+    font-size: .86rem;
+    font-weight: 750;
+    list-style-position: inside;
+}
+.potts-life-story__history-more[open] > summary {
+    margin-bottom: .25rem;
+}
+.potts-life-story__history-more ol {
+    margin-top: .25rem;
+}
+.potts-life-story__history-heading p {
+    text-transform: none;
+}
+
+
+/* 0.6.1 smart organisation */
+.potts-life-story__quote {
+    margin: 1.15rem 0 0;
+    padding: 1rem 1.15rem 1rem 1.35rem;
+    border-left: 4px solid #b78b3e;
+    border-radius: 0 .8rem .8rem 0;
+    background: rgba(255,250,238,.72);
+}
+.potts-life-story__quote p {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    line-height: 1.65;
+}
+.potts-life-story__quote cite {
+    display: block;
+    margin-top: .45rem;
+    color: var(--pls-muted);
+    font-size: .78rem;
+    font-style: normal;
+    font-weight: 700;
+}
+.potts-story-group__featured {
+    display: block;
+    margin-top: .35rem;
+    color: color-mix(in srgb, var(--pls-ink) 78%, transparent);
+    font-size: .82rem;
+    line-height: 1.45;
+}
+.potts-story-group__featured b {
+    color: var(--event-accent);
+    font-size: .68rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+/* 0.6.2 adaptive story profiles */
+.potts-life-story__profile {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    margin: .25rem 0 .25rem;
+    padding: .34rem .65rem;
+    border: 1px solid rgba(13,103,120,.14);
+    border-radius: 999px;
+    background: rgba(13,103,120,.055);
+    color: #35575e;
+    font-size: .82rem;
+    font-weight: 700;
+}
+.potts-life-story__profile span {
+    color: #9a6e19;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+/* 0.6.4 media classification foundation */
+.potts-story-group--memory > summary {
+    background: linear-gradient(135deg, rgba(255,252,247,.96), rgba(248,243,236,.92));
+}
+
+.potts-story-event--memory .potts-story-event__value::before {
+    content: "Associated record";
+    display: block;
+    margin-bottom: .18rem;
+    color: #8b6a4d;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+/* 0.7.0 illustrated biography */
+.potts-story-gallery {
+    margin: .25rem 0;
+    padding: 1rem;
+    border: 1px solid rgba(75, 94, 95, .14);
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(247,243,233,.72));
+}
+.potts-story-gallery > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 1rem;
+    margin-bottom: .85rem;
+}
+.potts-story-gallery > header h4 { margin: 0; font-size: 1.05rem; }
+.potts-story-gallery > header p { margin: .2rem 0 0; color: var(--pls-muted); }
+.potts-story-gallery > header > span {
+    flex: 0 0 auto;
+    padding: .3rem .6rem;
+    border-radius: 999px;
+    background: rgba(13,103,120,.08);
+    color: #0d6778;
+    font-size: .78rem;
+    font-weight: 750;
+}
+.potts-story-gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .75rem;
+}
+.potts-story-illustration {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(75,94,95,.13);
+    border-radius: .85rem;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(40,55,58,.06);
+}
+.potts-story-illustration__media {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+    overflow: hidden;
+    background: #f1f0eb;
+}
+.potts-story-illustration__media > a.gallery,
+.potts-story-illustration__document-link {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    text-decoration: none;
+}
+.potts-story-illustration__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+.potts-story-illustration__media > a.gallery:focus-visible,
+.potts-story-illustration__document-link:focus-visible {
+    outline: 3px solid rgba(13,103,120,.38);
+    outline-offset: -3px;
+}
+.potts-story-illustration__document {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: rgba(13,103,120,.1);
+    color: #0d6778;
+    font-size: 1.6rem;
+}
+.potts-story-illustration figcaption {
+    display: grid;
+    gap: .15rem;
+    padding: .7rem .8rem .8rem;
+}
+.potts-story-illustration figcaption strong {
+    overflow-wrap: anywhere;
+    font-size: .9rem;
+    line-height: 1.35;
+}
+.potts-story-illustration figcaption span {
+    color: var(--pls-muted);
+    font-size: .75rem;
+    text-transform: capitalize;
+}
+.potts-story-gallery__more { margin-top: .8rem; }
+.potts-story-gallery__more > summary {
+    min-height: 2.75rem;
+    padding: .65rem .8rem;
+    border-radius: .7rem;
+    background: rgba(13,103,120,.07);
+    color: #0d6778;
+    cursor: pointer;
+    font-weight: 750;
+}
+.potts-story-gallery__more[open] > summary { margin-bottom: .8rem; }
+.potts-story-media-record {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    padding: .85rem;
+    border: 1px solid rgba(75,94,95,.13);
+    border-radius: .8rem;
+    background: #fff;
+}
+.potts-story-media-record > span {
+    display: grid;
+    place-items: center;
+    flex: 0 0 2rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: rgba(13,103,120,.1);
+    color: #0d6778;
+}
+.potts-story-media-record p { margin: .15rem 0 0; color: var(--pls-muted); }
+.potts-life-story__research-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.5rem 0 .5rem;
+    padding: 1rem 1.1rem;
+    border-top: 1px solid var(--pls-line);
+    color: var(--pls-muted);
+}
+.potts-life-story__research-link p { margin: 0; }
+.potts-life-story__research-link a {
+    flex: 0 0 auto;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .65rem .9rem;
+    border: 1px solid rgba(13,103,120,.25);
+    border-radius: .75rem;
+    background: rgba(13,103,120,.06);
+    color: #0d6778;
+    font-weight: 750;
+    text-decoration: none;
+}
+.potts-life-story__research-link a:hover,
+.potts-life-story__research-link a:focus-visible { background: rgba(13,103,120,.12); }
+
+@media (max-width: 760px) {
+    .potts-life-story { max-width: 100%; }
+    .potts-life-story__intro { padding: 1rem; border-radius: .8rem; }
+    .potts-life-story__milestones {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        padding-bottom: .35rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    .potts-life-story__milestones a {
+        flex: 0 0 8.25rem;
+        scroll-snap-align: start;
+    }
+    .potts-life-story__chapter-nav {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: .45rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    .potts-life-story__chapter-nav a { flex: 0 0 auto; white-space: nowrap; }
+    .potts-life-story__highlights { grid-template-columns: 1fr; }
+    .potts-life-story__highlights-title { white-space: normal; }
+    .potts-story-gallery__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .potts-story-gallery > header { display: block; }
+    .potts-story-gallery > header > span { display: inline-block; margin-top: .5rem; }
+    .potts-life-story__research-link { display: grid; }
+    .potts-life-story__research-link a { width: 100%; }
+}
+
+@media (max-width: 430px) {
+    .potts-life-story__intro h2 { font-size: 1.5rem; }
+    .potts-story-chapter__header { gap: .65rem; }
+    .potts-story-chapter__line { width: 1.6rem; }
+    .potts-story-gallery { padding: .75rem; }
+    .potts-story-gallery__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .potts-story-illustration__media { aspect-ratio: 4 / 3; }
+    .potts-story-event { grid-template-columns: 1.9rem minmax(0,1fr); padding-inline: .45rem .7rem; }
+    .potts-story-event__marker { width: 1.75rem; height: 1.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .potts-life-story__milestones,
+    .potts-life-story__chapter-nav { scroll-behavior: auto; }
+}
+
+@media (max-width: 350px) {
+    .potts-story-gallery__grid { grid-template-columns: 1fr; }
+}
+
+
+/* 0.7.0-alpha.3 reliable biography thumbnails */
+.potts-story-illustration__image-link {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    min-height: 11.25rem;
+    place-items: center;
+    overflow: hidden;
+    border-radius: .7rem;
+    background: color-mix(in srgb, var(--pls-paper, #fff) 88%, #e9ecef);
+    text-decoration: none;
+}
+.potts-story-illustration__image {
+    display: block;
+    width: 100%;
+    height: 11.25rem;
+    object-fit: contain;
+    background: transparent;
+}
+.potts-story-illustration__image-link:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--bs-primary, #0d6efd) 70%, white);
+    outline-offset: 3px;
+}
+
+/* 0.7.0-alpha.4: use the native webtrees media renderer for local and external files. */
+.potts-story-illustration__image-link > a {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    text-decoration: none;
+}
+.potts-story-illustration__image-link > a.gallery {
+    cursor: zoom-in;
+}
+.potts-story-illustration__image-link > a:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--bs-primary, #0d6efd) 70%, white);
+    outline-offset: -3px;
+    border-radius: .7rem;
+}
+
+/* 0.7.0-alpha.5: reliable direct-media thumbnails. */
+a.potts-story-illustration__image-link.gallery {
+    display: grid;
+    width: 100%;
+    height: 11.25rem;
+    min-height: 11.25rem;
+    place-items: center;
+    overflow: hidden;
+    border-radius: .7rem;
+    background: color-mix(in srgb, var(--pls-paper, #fff) 88%, #e9ecef);
+    cursor: zoom-in;
+    text-decoration: none;
+}
+a.potts-story-illustration__image-link.gallery > img.potts-story-illustration__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 11.25rem;
+    object-fit: contain;
+}
+
+
+/* 0.7.0-alpha.6: resilient previews and single-placement media. */
+.potts-story-illustration__preview-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 11.25rem;
+    overflow: hidden;
+}
+.potts-story-illustration__preview {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: 11.25rem;
+    border: 0;
+    background: transparent;
+}
+.potts-story-illustration__preview .potts-story-illustration__image,
+.potts-story-illustration__preview > img {
+    width: 100%;
+    height: 11.25rem;
+    object-fit: contain;
+}
+.potts-story-illustration__fallback {
+    display: grid;
+    place-items: center;
+    min-height: 11.25rem;
+    color: var(--pls-muted);
+    font-size: 2rem;
+}
+a.potts-story-illustration__image-link.gallery {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
+    min-height: 11.25rem;
+    cursor: zoom-in;
+    background: transparent;
+}
+a.potts-story-illustration__image-link.gallery:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--bs-primary, #0d6efd) 70%, white);
+    outline-offset: -3px;
+    border-radius: .7rem;
+}
+
+/* 0.7.0-alpha.7: central media renderer with reliable two-stage fallback. */
+.potts-story-illustration__image-link {
+    position: relative;
+    display: grid;
+    width: 100%;
+    min-height: 11.25rem;
+    place-items: center;
+    overflow: hidden;
+    background: #f1f0eb;
+    cursor: zoom-in;
+    text-decoration: none;
+}
+.potts-story-illustration__image-link > .potts-story-illustration__image {
+    display: block;
+    width: 100%;
+    height: 11.25rem;
+    max-width: 100%;
+    object-fit: contain;
+}
+.potts-story-illustration__unavailable {
+    display: grid;
+    width: 100%;
+    min-height: 11.25rem;
+    place-items: center;
+    align-content: center;
+    gap: .35rem;
+    padding: 1rem;
+    color: var(--pls-muted);
+    text-align: center;
+}
+.potts-story-illustration__unavailable[hidden] { display: none !important; }
+.potts-story-illustration__unavailable > span { font-size: 1.8rem; }
+.potts-story-illustration__unavailable > strong { color: var(--pls-ink); font-size: .85rem; }
+.potts-story-illustration__unavailable > small {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: .72rem;
+}
+
+/* 0.7.0-alpha.8: native webtrees thumbnails with one original-file fallback. */
+.potts-story-illustration__preview-wrap {
+    position: relative;
+    display: grid;
+    width: 100%;
+    height: 11.25rem;
+    min-height: 11.25rem;
+    place-items: center;
+    overflow: hidden;
+    background: #f1f0eb;
+}
+.potts-story-illustration__preview-wrap > a.gallery {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    overflow: hidden;
+    cursor: zoom-in;
+    text-decoration: none;
+}
+.potts-story-illustration__preview-wrap > a.gallery > img.potts-story-illustration__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 11.25rem;
+    object-fit: contain;
+    background: transparent;
+}
+.potts-story-illustration__preview-wrap .potts-story-illustration__unavailable {
+    position: absolute;
+    inset: 0;
+}
+
+
+/* 0.7.0-alpha.9: browser-scaled originals; no server thumbnail generation. */
+.potts-story-illustration__preview-wrap > a.gallery > img.potts-story-illustration__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    content-visibility: auto;
+}
+
+
+/* 0.7.0-alpha.10: use the same MediaFile::displayImage() markup as the core Album tab. */
+.potts-story-illustration__media--native {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(6.25rem, 1fr));
+    gap: .5rem;
+    align-items: center;
+    justify-items: center;
+    min-height: 8rem;
+    padding: .65rem;
+}
+.potts-story-illustration__media--native > a {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 6.25rem;
+    text-decoration: none;
+}
+.potts-story-illustration__media--native img.potts-story-illustration__image {
+    width: 100px !important;
+    height: 100px !important;
+    max-width: 100%;
+    object-fit: contain;
+    background: #fff;
+}
+.potts-story-illustration__media--native .wt-icon-mime {
+    max-width: 4rem;
+    max-height: 4rem;
+}
+
+
+/* 0.7.0-alpha.11: compact Album-style media cards with larger previews. */
+.potts-story-gallery__grid {
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 11.75rem));
+    justify-content: start;
+    align-items: start;
+}
+.potts-story-illustration {
+    width: 100%;
+    max-width: 11.75rem;
+}
+.potts-story-illustration__media,
+.potts-story-illustration__media--native {
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+    padding: .4rem;
+}
+.potts-story-illustration__media--native {
+    grid-template-columns: 1fr;
+}
+.potts-story-illustration__media--native > a {
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+}
+.potts-story-illustration__media--native img.potts-story-illustration__image {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 180px !important;
+    max-height: 135px !important;
+    object-fit: contain;
+    background: transparent;
+}
+@media (max-width: 760px) {
+    .potts-story-gallery__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .potts-story-illustration {
+        max-width: none;
+    }
+}
+@media (max-width: 350px) {
+    .potts-story-gallery__grid {
+        grid-template-columns: 1fr;
+    }
+    .potts-story-illustration {
+        max-width: 18rem;
+    }
+}
+
+
+/* 0.7.0-alpha.12: preserve each media file's natural aspect ratio. */
+.potts-story-gallery__grid {
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 16rem));
+    justify-content: start;
+    align-items: start;
+}
+.potts-story-gallery__grid > .potts-story-illustration:only-child {
+    grid-column: 1 / -1;
+    width: min(100%, 30rem);
+    max-width: 30rem;
+}
+.potts-story-illustration {
+    width: 100%;
+    max-width: 16rem;
+}
+.potts-story-gallery__grid > .potts-story-illustration:only-child {
+    max-width: 30rem;
+}
+.potts-story-illustration__media,
+.potts-story-illustration__media--native,
+.potts-story-illustration__media--native > a {
+    aspect-ratio: auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 0;
+}
+.potts-story-illustration__media--native {
+    display: block;
+    background: #f1f0eb;
+}
+.potts-story-illustration__media--native > a.gallery {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+}
+.potts-story-illustration__media--native img.potts-story-illustration__image,
+.potts-story-illustration__media--native img.wt-album-tab-image {
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    margin: 0 auto;
+    object-fit: contain;
+    background: transparent;
+}
+.potts-story-illustration__media--native .wt-icon-mime {
+    display: block;
+    max-width: 5rem;
+    max-height: 5rem;
+    margin: 2rem auto;
+}
+@media (max-width: 760px) {
+    .potts-story-gallery__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .potts-story-illustration,
+    .potts-story-gallery__grid > .potts-story-illustration:only-child {
+        max-width: none;
+    }
+}
+@media (max-width: 430px) {
+    .potts-story-illustration__media,
+    .potts-story-illustration__media--native {
+        aspect-ratio: auto !important;
+    }
+}
+@media (max-width: 350px) {
+    .potts-story-gallery__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 0.7.0-alpha.13: show renderable images first and keep title-only media facts separate. */
+.potts-story-gallery__records {
+    margin-top: .8rem;
+    border-top: 1px solid rgba(75,94,95,.12);
+    padding-top: .7rem;
+}
+.potts-story-gallery__records > summary {
+    min-height: 2.6rem;
+    padding: .6rem .75rem;
+    border-radius: .65rem;
+    background: rgba(13,103,120,.055);
+    color: #46646a;
+    cursor: pointer;
+    font-size: .82rem;
+    font-weight: 750;
+}
+.potts-story-gallery__record-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: .55rem;
+    margin-top: .65rem;
+}
+.potts-story-gallery__record-list .potts-story-media-record {
+    min-height: 4.5rem;
+    box-shadow: none;
+}
+.potts-story-gallery__grid > .potts-story-illustration:only-child {
+    width: min(100%, 24rem);
+    max-width: 24rem;
+}
+.potts-story-illustration__media--native img.potts-story-illustration__image,
+.potts-story-illustration__media--native img.wt-album-tab-image {
+    max-height: 22rem !important;
+}
+@media (max-width: 760px) {
+    .potts-story-gallery__record-list {
+        grid-template-columns: 1fr;
+    }
+    .potts-story-gallery__grid > .potts-story-illustration:only-child {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* 0.7.0-alpha.15: curated chapter media layout. */
+.potts-story-gallery--curated {
+    display: grid;
+    gap: 1rem;
+}
+.potts-story-gallery--curated > header {
+    margin-bottom: 0;
+}
+.potts-story-gallery__featured {
+    max-width: 32rem;
+}
+.potts-story-gallery__featured .potts-story-illustration {
+    width: 100%;
+    max-width: 32rem;
+}
+.potts-story-gallery__featured .potts-story-illustration__media--native img.potts-story-illustration__image,
+.potts-story-gallery__featured .potts-story-illustration__media--native img.wt-album-tab-image {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 28rem !important;
+    object-fit: contain;
+}
+.potts-story-gallery__section {
+    display: grid;
+    gap: .65rem;
+    padding-top: .2rem;
+}
+.potts-story-gallery__section + .potts-story-gallery__section {
+    padding-top: .9rem;
+    border-top: 1px solid rgba(75,94,95,.12);
+}
+.potts-story-gallery__section h5 {
+    margin: 0;
+    color: var(--pls-ink);
+    font-size: .92rem;
+}
+.potts-story-gallery__grid--supporting,
+.potts-story-gallery__grid--documents {
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 13rem));
+}
+.potts-story-gallery__grid--documents .potts-story-illustration {
+    max-width: 13rem;
+}
+.potts-story-gallery--curated .potts-story-gallery__more {
+    margin-top: 0;
+}
+@media (max-width: 760px) {
+    .potts-story-gallery__featured,
+    .potts-story-gallery__featured .potts-story-illustration {
+        max-width: 100%;
+    }
+    .potts-story-gallery__grid--supporting,
+    .potts-story-gallery__grid--documents {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 380px) {
+    .potts-story-gallery__grid--supporting,
+    .potts-story-gallery__grid--documents {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 0.8.0-alpha.1 — Responsive Biography
+ * Phone-first corrections for the Potts Modern biography header and the
+ * Life Story reading experience. These rules intentionally sit at the end
+ * of the stylesheet so later desktop theme rules cannot re-create a
+ * two-column header on narrow screens.
+ */
+@media (max-width: 767.98px) {
+    body:has(.potts-life-story) main {
+        overflow-x: clip;
+    }
+
+    body:has(.potts-life-story) .potts-profile-hero {
+        padding: 1rem !important;
+        border-radius: .95rem;
+    }
+
+    body:has(.potts-life-story) .potts-profile-toolbar {
+        margin-bottom: 1rem;
+    }
+
+    body:has(.potts-life-story) .potts-profile-grid {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 1.1rem !important;
+        width: 100%;
+    }
+
+    body:has(.potts-life-story) .potts-profile-photo {
+        grid-column: 1 !important;
+        width: min(100%, 24rem) !important;
+        max-width: 100% !important;
+        margin-inline: auto !important;
+    }
+
+    body:has(.potts-life-story) .potts-profile-photo img,
+    body:has(.potts-life-story) .potts-profile-media-layer img,
+    body:has(.potts-life-story) .potts-profile-fallback-image {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: 26rem !important;
+        aspect-ratio: auto !important;
+        object-fit: contain !important;
+        object-position: center !important;
+    }
+
+    body:has(.potts-life-story) .potts-profile-core {
+        grid-column: 1 !important;
+        min-width: 0;
+        text-align: center;
+    }
+
+    body:has(.potts-life-story) .potts-profile-name {
+        max-width: 100% !important;
+        margin-inline: auto !important;
+        font-size: clamp(2rem, 10vw, 3rem) !important;
+        line-height: 1.02 !important;
+        text-align: center !important;
+        overflow-wrap: anywhere;
+    }
+
+    body:has(.potts-life-story) .potts-profile-lifespan {
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: baseline;
+        gap: .3rem .55rem;
+        margin: .65rem 0 1rem !important;
+        text-align: center !important;
+        font-size: 1.2rem !important;
+    }
+
+    body:has(.potts-life-story) .potts-profile-lifespan small {
+        font-size: .95rem !important;
+    }
+
+    body:has(.potts-life-story) .potts-profile-chips {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        align-items: center;
+        gap: .45rem !important;
+        margin: 0 auto 1.1rem !important;
+        max-width: 100%;
+    }
+
+    body:has(.potts-life-story) .potts-profile-chip {
+        display: inline-flex;
+        align-items: center;
+        width: auto !important;
+        max-width: 100%;
+        min-height: 2.5rem;
+        padding: .5rem .75rem !important;
+        border-radius: 999px !important;
+        line-height: 1.25 !important;
+        text-align: center;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    body:has(.potts-life-story) .potts-profile-vitals {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: .8rem !important;
+        margin-top: 1rem !important;
+        text-align: left;
+    }
+
+    body:has(.potts-life-story) .potts-vital {
+        min-height: 0 !important;
+        padding: .75rem 0 .75rem .8rem !important;
+    }
+
+    body:has(.potts-life-story) .potts-profile-marriages,
+    body:has(.potts-life-story) .potts-profile-life-summary {
+        text-align: left;
+    }
+
+    body:has(.potts-life-story) .potts-profile-family {
+        grid-column: 1 !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: .8rem !important;
+        padding: 1rem 0 0 !important;
+        border-left: 0 !important;
+        border-top: 1px solid var(--bs-border-color, #dde3df) !important;
+        text-align: left;
+    }
+
+    body:has(.potts-life-story) .potts-life-stats {
+        display: flex !important;
+        gap: .55rem;
+        padding: .55rem;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scroll-snap-type: inline proximity;
+        border-radius: .9rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body:has(.potts-life-story) .potts-life-stat {
+        flex: 0 0 7.25rem;
+        min-height: 6.25rem !important;
+        padding: 1.8rem .65rem .65rem !important;
+        border: 1px solid var(--bs-border-color, #dde3df) !important;
+        border-radius: .75rem;
+        scroll-snap-align: start;
+    }
+
+    body:has(.potts-life-story) .potts-profile-content {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1rem;
+        margin-inline: 0 !important;
+    }
+
+    body:has(.potts-life-story) .potts-profile-content > [class*="col-"] {
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-inline: 0 !important;
+    }
+
+    body:has(.potts-life-story) .potts-profile-content > .col-sm-4 {
+        order: 2;
+    }
+
+    .potts-life-story {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .potts-life-story__intro {
+        padding: 1rem;
+        border-radius: .9rem;
+    }
+
+    .potts-life-story__intro h2 {
+        font-size: clamp(1.55rem, 7vw, 2.1rem);
+        line-height: 1.08;
+    }
+
+    .potts-life-story__biography {
+        font-size: 1rem;
+        line-height: 1.65;
+    }
+
+    .potts-life-story__milestones {
+        display: flex;
+        gap: .55rem;
+        overflow-x: auto;
+        padding-bottom: .25rem;
+        scroll-snap-type: inline proximity;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .potts-life-story__milestones a {
+        flex: 0 0 8.5rem;
+        scroll-snap-align: start;
+    }
+
+    .potts-life-story__highlights {
+        grid-template-columns: 1fr;
+        gap: .45rem;
+    }
+
+    .potts-life-story__highlights-title {
+        white-space: normal;
+    }
+
+    .potts-life-story__chapter-nav {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scroll-snap-type: inline proximity;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .potts-life-story__chapter-nav a {
+        flex: 0 0 auto !important;
+        min-height: 2.75rem;
+        display: inline-flex;
+        align-items: center;
+        padding-inline: .85rem;
+        white-space: nowrap !important;
+        scroll-snap-align: start;
+    }
+
+    .potts-story-chapter {
+        margin-block: 1.25rem 1.8rem;
+    }
+
+    .potts-story-chapter__header {
+        align-items: flex-start;
+        gap: .7rem;
+    }
+
+    .potts-story-chapter__line {
+        flex: 0 0 2rem;
+        margin-top: .55rem;
+    }
+
+    .potts-story-chapter__narrative {
+        max-width: 100%;
+        margin: -.15rem 0 .85rem !important;
+    }
+
+    .potts-story-events {
+        gap: .65rem;
+        padding-left: .55rem;
+    }
+
+    .potts-story-events::before {
+        left: .2rem;
+    }
+
+    .potts-story-event {
+        grid-template-columns: 1.9rem minmax(0, 1fr);
+        gap: .55rem;
+        padding: .8rem .75rem .8rem .45rem;
+    }
+
+    .potts-story-event__marker,
+    .potts-story-group__icon {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
+    .potts-story-event__heading {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: .15rem;
+    }
+
+    .potts-story-event__heading time {
+        text-align: left;
+    }
+
+    .potts-story-group > summary {
+        grid-template-columns: 1.9rem minmax(0, 1fr) !important;
+        gap: .6rem;
+        min-height: 3rem;
+        padding: .8rem;
+    }
+
+    .potts-story-group__events {
+        padding: 0 .55rem .65rem .45rem !important;
+    }
+
+    .potts-story-gallery {
+        padding: .75rem !important;
+    }
+
+    .potts-story-gallery > header {
+        align-items: flex-start;
+        gap: .5rem;
+    }
+
+    .potts-story-gallery__grid,
+    .potts-story-gallery__grid--supporting,
+    .potts-story-gallery__grid--documents {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: .65rem !important;
+    }
+
+    .potts-story-gallery__featured {
+        max-width: 100%;
+    }
+
+    .potts-story-illustration figcaption,
+    .potts-story-media-record {
+        font-size: .8rem;
+    }
+
+    .potts-story-gallery__more > summary,
+    .potts-story-gallery__records > summary,
+    .potts-story-group > summary,
+    .potts-life-story__chapter-nav a,
+    .potts-life-story__milestones a {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 420px) {
+    body:has(.potts-life-story) .potts-profile-hero {
+        padding: .8rem !important;
+    }
+
+    body:has(.potts-life-story) .potts-profile-photo {
+        width: 100% !important;
+    }
+
+    body:has(.potts-life-story) .potts-profile-vitals {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .potts-story-gallery__grid,
+    .potts-story-gallery__grid--supporting,
+    .potts-story-gallery__grid--documents {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .potts-story-event {
+        grid-template-columns: 1.75rem minmax(0, 1fr);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .potts-life-story *,
+    .potts-life-story *::before,
+    .potts-life-story *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+/* Country-aware historical context */
+.potts-life-story__history-context {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .2rem;
+    align-items: baseline;
+}
+.potts-life-story__history-context b {
+    color: var(--potts-story-text, #26383a);
+    font-weight: 700;
+}
+
+/* 0.8.2 story-first chapter layout */
+.potts-story-chapter__narrative {
+    max-width: 70ch;
+    font-size: 1.02rem;
+    line-height: 1.72;
+    margin-bottom: 1.05rem;
+}
+.potts-story-chapter > .potts-story-events > .potts-story-gallery:first-child,
+.potts-story-chapter > .potts-story-events > .potts-story-illustration:first-child {
+    margin-top: .15rem;
+    margin-bottom: 1.25rem;
+}
+.potts-story-gallery--curated {
+    border: 1px solid color-mix(in srgb, var(--pls-accent) 16%, transparent);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--pls-paper) 96%, white), color-mix(in srgb, var(--pls-accent-soft) 22%, white));
+}
+.potts-story-gallery__featured {
+    max-width: 46rem;
+    margin: .85rem 0 1rem;
+}
+.potts-story-gallery__featured .potts-story-illustration {
+    width: min(100%, 46rem);
+}
+.potts-story-gallery__section--records .potts-story-illustration {
+    background: color-mix(in srgb, var(--pls-paper) 90%, var(--pls-accent-soft));
+}
+.potts-story-gallery__section h5 {
+    margin: .85rem 0 .55rem;
+    font-size: .78rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--pls-muted);
+}
+.potts-story-illustration figcaption strong {
+    line-height: 1.3;
+}
+.potts-story-event,
+.potts-story-group {
+    position: relative;
+}
+.potts-story-gallery + .potts-story-event,
+.potts-story-gallery + .potts-story-group,
+.potts-story-illustration + .potts-story-event,
+.potts-story-illustration + .potts-story-group {
+    margin-top: 1rem;
+}
+.potts-life-story__history {
+    border-left: 3px solid color-mix(in srgb, var(--pls-accent) 55%, transparent);
+}
+@media (max-width: 760px) {
+    .potts-story-chapter__narrative { font-size: 1rem; line-height: 1.65; }
+    .potts-story-gallery__featured { max-width: none; }
+    .potts-story-gallery__featured .potts-story-illustration { width: 100%; }
+    .potts-story-gallery__grid--supporting,
+    .potts-story-gallery__grid--documents { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 390px) {
+    .potts-story-gallery__grid--supporting,
+    .potts-story-gallery__grid--documents { grid-template-columns: 1fr; }
+}
+
+/* 0.9.0-alpha.2 — media timeline captions */
+.potts-story-illustration__date {
+    display: block;
+    margin-top: .2rem;
+    color: var(--bs-secondary-color, #6c757d);
+    font-size: .82rem;
+    line-height: 1.3;
+}
+
+/* 0.9.0-alpha.3 — curated story layout */
+.potts-story-chapter__supporting-heading {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: 1.35rem 0 .75rem;
+}
+.potts-story-chapter__supporting-heading > span {
+    width: 2.25rem;
+    height: 2px;
+    flex: 0 0 auto;
+    background: var(--pls-accent, #8b6f3d);
+    opacity: .65;
+}
+.potts-story-chapter__supporting-heading h4 {
+    margin: 0;
+    color: var(--pls-muted);
+    font-size: .82rem;
+    font-weight: 750;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+}
+.potts-story-gallery--curated {
+    margin-top: .35rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--pls-surface, #fff) 94%, var(--pls-accent, #8b6f3d));
+}
+.potts-story-gallery__featured {
+    max-width: 760px;
+    margin: .9rem auto 1.15rem;
+}
+.potts-story-gallery__featured .potts-story-illustration {
+    width: 100%;
+    margin: 0;
+    box-shadow: 0 .45rem 1.25rem rgba(36, 45, 42, .12);
+}
+.potts-story-gallery__featured .potts-story-illustration__media--native img.potts-story-illustration__image,
+.potts-story-gallery__featured .potts-story-illustration__media--native img.wt-album-tab-image {
+    width: 100%;
+    max-height: 460px;
+    object-fit: contain;
+}
+.potts-story-gallery__grid--supporting {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.potts-story-gallery__grid--documents {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.potts-story-gallery__section--records {
+    padding-top: .9rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 13%, transparent);
+}
+.potts-story-gallery__section--records .potts-story-illustration {
+    box-shadow: none;
+    background: color-mix(in srgb, var(--pls-surface, #fff) 96%, #000);
+}
+.potts-story-illustration__date {
+    display: block;
+    margin-top: .15rem;
+    color: var(--pls-muted);
+    font-size: .8rem;
+}
+@media (max-width: 760px) {
+    .potts-story-gallery--curated { padding: .8rem; }
+    .potts-story-gallery__featured { max-width: none; }
+    .potts-story-gallery__featured .potts-story-illustration__media--native img.potts-story-illustration__image,
+    .potts-story-gallery__featured .potts-story-illustration__media--native img.wt-album-tab-image {
+        max-height: 360px;
+    }
+    .potts-story-gallery__grid--supporting,
+    .potts-story-gallery__grid--documents {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 430px) {
+    .potts-story-chapter__supporting-heading > span { width: 1.35rem; }
+    .potts-story-chapter__supporting-heading h4 { font-size: .75rem; }
+    .potts-story-gallery__grid--supporting,
+    .potts-story-gallery__grid--documents {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* 0.9.1-alpha.1 — richer, book-like chapter openings */
+.potts-story-chapter__subtitle {
+    margin: .3rem 0 0;
+    color: var(--bs-secondary-color, #66737a);
+    font-size: .92rem;
+    line-height: 1.45;
+    font-style: italic;
+}
+
+.potts-story-chapter__opening {
+    margin: 0 0 1rem 2.8rem;
+    padding: .8rem 1rem;
+    border-left: 3px solid color-mix(in srgb, var(--potts-story-accent, #2f6f68) 45%, transparent);
+    background: color-mix(in srgb, var(--bs-body-bg, #fff) 94%, var(--potts-story-accent, #2f6f68));
+    border-radius: 0 .75rem .75rem 0;
+}
+
+.potts-story-chapter__opening .potts-story-chapter__narrative {
+    margin: 0;
+    max-width: 72ch;
+    font-size: 1rem;
+    line-height: 1.72;
+}
+
+@media (max-width: 767.98px) {
+    .potts-story-chapter__subtitle {
+        font-size: .88rem;
+    }
+
+    .potts-story-chapter__opening {
+        margin-left: 0;
+        padding: .7rem .8rem;
+    }
+}
+
+
+/* 0.9.1-alpha.2: narrative bridges between life stages. */
+.potts-story-chapter__transition {
+    max-width: 46rem;
+    margin: 2.25rem 0 1.15rem 3.15rem;
+    padding: .8rem 1rem .8rem 1.1rem;
+    border-left: 3px solid color-mix(in srgb, var(--pls-accent, #b6892f) 65%, transparent);
+    color: var(--pls-muted);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.02rem;
+    font-style: italic;
+    line-height: 1.65;
+}
+@media (max-width: 760px) {
+    .potts-story-chapter__transition {
+        margin: 1.65rem 0 .9rem;
+        padding: .7rem .85rem;
+        font-size: .96rem;
+    }
+}
+
+
+/* 0.9.1-alpha.3 — book-like stage labels and quieter event counts. */
+.potts-story-chapter__stage {
+    margin: 0 0 .18rem;
+    color: var(--potts-story-accent, #2f6f68);
+    font-size: .76rem;
+    font-weight: 750;
+    letter-spacing: .09em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.potts-story-chapter__count {
+    margin: .24rem 0 0;
+    color: var(--bs-secondary-color, #6b7479);
+    font-size: .78rem;
+    line-height: 1.35;
+}
+
+@media (max-width: 767.98px) {
+    .potts-story-chapter__stage {
+        font-size: .7rem;
+        letter-spacing: .07em;
+    }
+
+    .potts-story-chapter__count {
+        font-size: .74rem;
+    }
+}
+
+/* 0.9.2-alpha.1 — research notes integrated with the supporting event. */
+.potts-story-event__notes {
+    display: grid;
+    gap: .65rem;
+    margin-top: .85rem;
+}
+
+.potts-story-event__note {
+    margin: 0;
+    border: 1px solid color-mix(in srgb, var(--pls-accent, #8b6f3d) 18%, transparent);
+    border-radius: .75rem;
+    background: color-mix(in srgb, var(--pls-paper, #fff) 96%, var(--pls-accent-soft, #f1eadc));
+    color: var(--pls-text, inherit);
+}
+
+.potts-story-event__note--inline {
+    padding: .75rem .9rem;
+    border-left: 3px solid color-mix(in srgb, var(--pls-accent, #8b6f3d) 55%, transparent);
+}
+
+.potts-story-event__note-label {
+    margin: 0 0 .35rem;
+    color: var(--pls-muted, #687277);
+    font-size: .72rem;
+    font-weight: 750;
+    letter-spacing: .065em;
+    text-transform: uppercase;
+}
+
+.potts-story-event__note-content + .potts-story-event__note-content {
+    margin-top: .65rem;
+    padding-top: .65rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.potts-story-event__note-content > :last-child,
+.potts-story-event__note-content .wt-fact-notes > :last-child {
+    margin-bottom: 0;
+}
+
+.potts-story-event__note--details > summary {
+    min-height: 44px;
+    padding: .7rem .9rem;
+    cursor: pointer;
+    color: var(--pls-accent, #376f68);
+    font-weight: 700;
+}
+
+.potts-story-event__note-expanded {
+    padding: 0 .9rem .85rem;
+}
+
+.potts-story-event__note .wt-fact-notes,
+.potts-story-event__note .wt-fact-gedcom-fields {
+    margin-top: 0 !important;
+}
+
+@media (max-width: 767.98px) {
+    .potts-story-event__notes {
+        margin-top: .7rem;
+    }
+
+    .potts-story-event__note--inline,
+    .potts-story-event__note-expanded {
+        padding-left: .75rem;
+        padding-right: .75rem;
+    }
+}
+
+
+/* 0.9.4 turning points */
+.potts-life-story__turning-points {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(13,103,120,.14);
+    border-radius: .9rem;
+    background: rgba(255,255,255,.78);
+}
+.potts-life-story__turning-points > header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: .8rem;
+}
+.potts-life-story__turning-points > header p {
+    margin: 0;
+    color: var(--pls-heading, #173d3a);
+    font-weight: 850;
+}
+.potts-life-story__turning-points > header span {
+    color: var(--pls-muted, #667273);
+    font-size: .8rem;
+}
+.potts-life-story__turning-points ol {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: .65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.potts-life-story__turning-point {
+    --turning-accent: #0d6778;
+    min-width: 0;
+    border-top: 3px solid var(--turning-accent);
+    border-radius: .65rem;
+    background: rgba(246,248,246,.88);
+    box-shadow: 0 4px 12px rgba(40,55,58,.05);
+}
+.potts-life-story__turning-point--family { --turning-accent: #5796bf; }
+.potts-life-story__turning-point--journey { --turning-accent: #2798a8; }
+.potts-life-story__turning-point--career { --turning-accent: #c28a11; }
+.potts-life-story__turning-point--service { --turning-accent: #718ba9; }
+.potts-life-story__turning-point--final { --turning-accent: #5f7076; }
+.potts-life-story__turning-point a {
+    display: grid;
+    gap: .2rem;
+    height: 100%;
+    padding: .75rem;
+    color: inherit;
+    text-decoration: none;
+}
+.potts-life-story__turning-point time {
+    color: #9a6e19;
+    font-size: .75rem;
+    font-weight: 850;
+}
+.potts-life-story__turning-point strong {
+    color: var(--pls-heading, #173d3a);
+    font-weight: 850;
+    line-height: 1.2;
+}
+.potts-life-story__turning-point a:visited strong {
+    color: var(--pls-heading, #173d3a);
+}
+.potts-life-story__turning-point a:hover strong,
+.potts-life-story__turning-point a:focus-visible strong {
+    color: var(--turning-accent);
+    text-decoration: underline;
+    text-decoration-thickness: .08em;
+    text-underline-offset: .16em;
+}
+.potts-life-story__turning-point span {
+    color: var(--pls-muted, #667273);
+    font-size: .8rem;
+    line-height: 1.35;
+}
+.potts-life-story__turning-point a:hover,
+.potts-life-story__turning-point a:focus-visible {
+    background: white;
+    border-radius: .65rem;
+}
+@media (max-width: 600px) {
+    .potts-life-story__turning-points {
+        padding: .8rem;
+    }
+    .potts-life-story__turning-points > header {
+        display: block;
+    }
+    .potts-life-story__turning-points > header span {
+        display: block;
+        margin-top: .2rem;
+    }
+    .potts-life-story__turning-points ol {
+        display: flex;
+        gap: .6rem;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        scrollbar-width: thin;
+    }
+    .potts-life-story__turning-point {
+        flex: 0 0 min(78vw, 245px);
+        scroll-snap-align: start;
+    }
+}
+
+
+/* 0.9.4-alpha.2 — key moments and story emphasis */
+.potts-story-event__title-wrap {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .45rem;
+    min-width: 0;
+}
+
+.potts-story-event__key-moment {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.35rem;
+    padding: .14rem .48rem;
+    border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bs-body-bg, #fff) 82%, #ead6a4);
+    color: #7a5510;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.potts-story-event--major {
+    box-shadow: 0 .45rem 1.2rem rgba(21, 54, 58, .09);
+}
+
+.potts-story-event--major .potts-story-event__marker {
+    transform: scale(1.06);
+}
+
+.potts-story-group__featured b {
+    letter-spacing: .035em;
+}
+
+@media (max-width: 575.98px) {
+    .potts-story-event__heading {
+        align-items: flex-start;
+    }
+
+    .potts-story-event__title-wrap {
+        gap: .3rem;
+    }
+
+    .potts-story-event__key-moment {
+        font-size: .62rem;
+    }
+}
+
+/* 0.9.5-alpha.1 — age-aware storytelling */
+.potts-story-event__age {
+    margin: .15rem 0 .1rem;
+    color: var(--bs-secondary-color, #66727a);
+    font-size: .82rem;
+    font-weight: 650;
+}
+
+@media (max-width: 575.98px) {
+    .potts-story-event__age {
+        font-size: .78rem;
+    }
+}
+
+/* 0.9.5-alpha.2 — narrative placement and connected storytelling */
+.potts-story-illustration__context {
+    display: block;
+    margin-top: .3rem;
+    color: var(--bs-secondary-color, #5f6b70);
+    font-size: .82rem;
+    line-height: 1.35;
+    font-style: italic;
+}
+
+
+/* 0.9.6-alpha.2 — keep long research-note content inside its event card. */
+.potts-story-event,
+.potts-story-event__body,
+.potts-story-event__notes,
+.potts-story-event__note,
+.potts-story-event__note-content,
+.potts-story-event__note-expanded,
+.potts-story-event__note .wt-fact-notes,
+.potts-story-event__note .wt-fact-gedcom-fields {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.potts-story-event__notes,
+.potts-story-event__note,
+.potts-story-event__note-content,
+.potts-story-event__note-expanded {
+    overflow-x: clip;
+}
+
+.potts-story-event__note-content,
+.potts-story-event__note-content p,
+.potts-story-event__note-content div,
+.potts-story-event__note-content span,
+.potts-story-event__note-content a,
+.potts-story-event__note-content .field,
+.potts-story-event__note-content .label,
+.potts-story-event__note-content .wt-fact-notes,
+.potts-story-event__note-content .wt-fact-gedcom-fields {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.potts-story-event__note-content img,
+.potts-story-event__note-content svg,
+.potts-story-event__note-content video,
+.potts-story-event__note-content iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.potts-story-event__note-content table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    -webkit-overflow-scrolling: touch;
+}
+
+.potts-story-event__note-content pre,
+.potts-story-event__note-content code {
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Bootstrap rows emitted by native webtrees note fields can use negative gutters. */
+.potts-story-event__note-content > .row,
+.potts-story-event__note-content .wt-fact-gedcom-fields > .row,
+.potts-story-event__note-content .wt-fact-notes > .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* 1.0 release safeguards: keep the Biography self-contained across webtrees themes. */
+.potts-life-story,
+.potts-life-story * {
+    box-sizing: border-box;
+}
+
+.potts-life-story {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.potts-life-story img,
+.potts-life-story svg,
+.potts-life-story video,
+.potts-life-story iframe,
+.potts-life-story canvas {
+    max-width: 100%;
+}
+
+.potts-life-story table {
+    max-width: 100%;
+}
+
+.potts-life-story a,
+.potts-life-story button,
+.potts-life-story summary {
+    touch-action: manipulation;
+}
+
+/* Do not depend on theme-specific link colours or heading margins. */
+.potts-life-story h2,
+.potts-life-story h3,
+.potts-life-story h4,
+.potts-life-story p,
+.potts-life-story ol,
+.potts-life-story ul {
+    max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+    .potts-life-story {
+        width: 100%;
+        padding-inline: .25rem;
+    }
+
+    .potts-story-event,
+    .potts-life-story__intro,
+    .potts-life-story__history,
+    .potts-life-story__turning-points {
+        min-width: 0;
+    }
+}
+
+@media print {
+    .potts-life-story {
+        max-width: none;
+        color: #000;
+    }
+
+    .potts-life-story details > * {
+        display: block !important;
+    }
+
+    .potts-life-story__chapter-nav,
+    .potts-life-story a[href^="#"] {
+        text-decoration: none;
+    }
+}
