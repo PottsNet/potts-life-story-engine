@@ -42,9 +42,9 @@ final class NameResolver
         }
 
         $formal = $this->formalName($individual);
-        $parts = preg_split('/\s+/u', trim($formal));
+        $given = $this->firstGivenName($primaryNameBlock, $formal);
 
-        return is_array($parts) && $parts !== [] ? (string) $parts[0] : $formal;
+        return $given !== '' ? $given : $formal;
     }
 
 
@@ -69,12 +69,13 @@ final class NameResolver
 
     public function knownAsPhrase(Individual $individual): string
     {
+        $gedcom = str_replace("\r\n", "\n", $individual->gedcom());
+        $primaryNameBlock = $this->primaryNameBlock($gedcom);
         $formal = $this->formalName($individual);
         $working = $this->narrativeName($individual);
-        $parts = preg_split('/\s+/u', $formal) ?: [];
-        $first = $parts[0] ?? $formal;
+        $first = $this->firstGivenName($primaryNameBlock, $formal);
 
-        return $working !== '' && mb_strtolower($working) !== mb_strtolower($first)
+        return $working !== '' && $first !== '' && mb_strtolower($working) !== mb_strtolower($first)
             ? $working
             : '';
     }
@@ -115,6 +116,45 @@ final class NameResolver
         }
 
         return '';
+    }
+
+    private function firstGivenName(string $nameBlock, string $formal): string
+    {
+        if ($nameBlock !== '' && preg_match('/^2 GIVN\s+(.+)$/m', $nameBlock, $match)) {
+            $given = $this->firstNameToken($this->plain($match[1]));
+            if ($given !== '') {
+                return $given;
+            }
+        }
+
+        if ($nameBlock !== '' && preg_match('/^1 NAME\s+(.+?)(?:\s+\/[^\/]*\/)?\s*$/m', $nameBlock, $match)) {
+            $givenText = $this->plain($match[1]);
+
+            // NAME may include an honorific/prefix before the given names.
+            // Prefer the explicit GIVN value above, but when it is absent use
+            // NPFX to remove the prefix before taking the first given token.
+            if (preg_match('/^2 NPFX\s+(.+)$/m', $nameBlock, $prefixMatch)) {
+                $prefix = $this->plain($prefixMatch[1]);
+                if ($prefix !== '') {
+                    $givenText = preg_replace('/^' . preg_quote($prefix, '/') . '\s+/iu', '', $givenText) ?? $givenText;
+                }
+            }
+
+            $given = $this->firstNameToken($givenText);
+            if ($given !== '') {
+                return $given;
+            }
+        }
+
+        return $this->firstNameToken($formal);
+    }
+
+    private function firstNameToken(string $value): string
+    {
+        $tokens = preg_split('/\s+/u', trim($value)) ?: [];
+        $first = $tokens[0] ?? '';
+
+        return trim((string) $first, "* \t\n\r\0\x0B\"");
     }
 
     private function plain(string $value): string
