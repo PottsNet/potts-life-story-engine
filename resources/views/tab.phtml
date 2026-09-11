@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Fisharebest\Webtrees\Age;
+use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Media;
@@ -22,6 +23,17 @@ use PottsLifeStoryEngine\StoryGroup;
 $plain = static function (string $value): string {
     $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     return trim((string) preg_replace('/\s+/u', ' ', strip_tags($value)));
+};
+
+$displayPlace = static function (Fact $fact) use ($plain): string {
+    $full = trim($fact->place()->gedcomName());
+    if ($full === '') {
+        return '';
+    }
+
+    $short = $plain($fact->place()->shortName());
+
+    return $short !== '' ? $short : $full;
 };
 
 $fullName = $nameResolver->formalName($individual);
@@ -109,7 +121,7 @@ $renderNotes = static function (StoryEvent $event): void {
     <?php
 };
 
-$renderEvent = static function (StoryEvent $event) use ($plain, $renderMedia, $renderNotes, $individual): void {
+$renderEvent = static function (StoryEvent $event) use ($plain, $displayPlace, $renderMedia, $renderNotes, $individual): void {
     if ($event->isMedia) {
         $renderMedia($event);
         return;
@@ -117,7 +129,7 @@ $renderEvent = static function (StoryEvent $event) use ($plain, $renderMedia, $r
 
     $fact = $event->fact;
     $date = $fact->date();
-    $place = trim($fact->place()->gedcomName());
+    $place = $displayPlace($fact);
     $value = $plain($fact->value());
     $ageText = '';
     if ($event->type !== 'BIRT' && $individual->getBirthDate()->isOK() && $date->isOK()) {
@@ -464,7 +476,7 @@ $renderEvent = static function (StoryEvent $event) use ($plain, $renderMedia, $r
                                             <?php
                                             $featuredFact = $item->featuredEvent->fact;
                                             $featuredValue = $plain($featuredFact->value());
-                                            $featuredPlace = trim($featuredFact->place()->gedcomName());
+                                            $featuredPlace = $displayPlace($featuredFact);
                                             ?>
                                             <span class="potts-story-group__featured">
                                                 <b><?= I18N::translate('Story highlight') ?></b>
