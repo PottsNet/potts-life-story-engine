@@ -48,43 +48,39 @@ jobs:
               s = replace_once(s, old, new, label)
 
           anchor = "    private function dateText(Fact $fact): string\n    {"
-          helper = '''    /**
-     * Reader-facing place names honour the tree's configured place abbreviation,
-     * while uniqueness/counting continues to use the full GEDCOM place identity.
-     *
-     * @param Collection<int,StoryEvent> $events
-     * @return Collection<int,string>
-     */
-    private function narrativePlaces(Collection $events): Collection
-    {
-        return $events
-            ->map(function (StoryEvent $event): array {
-                $full = trim($event->fact->place()->gedcomName());
-
-                return [
-                    'full' => $full,
-                    'display' => $this->placeText($event->fact),
-                ];
-            })
-            ->filter(static fn (array $place): bool => $place['full'] !== '')
-            ->unique('full')
-            ->map(static fn (array $place): string => $place['display'] !== '' ? $place['display'] : $place['full'])
-            ->values();
-    }
-
-    private function placeText(Fact $fact): string
-    {
-        $full = trim($fact->place()->gedcomName());
-        if ($full === '') {
-            return '';
-        }
-
-        $short = $this->plain($fact->place()->shortName());
-
-        return $short !== '' ? $short : $full;
-    }
-
-'''
+          helper = (
+              "    /**\n"
+              "     * Reader-facing place names honour the tree's configured place abbreviation,\n"
+              "     * while uniqueness/counting continues to use the full GEDCOM place identity.\n"
+              "     *\n"
+              "     * @param Collection<int,StoryEvent> $events\n"
+              "     * @return Collection<int,string>\n"
+              "     */\n"
+              "    private function narrativePlaces(Collection $events): Collection\n"
+              "    {\n"
+              "        return $events\n"
+              "            ->map(function (StoryEvent $event): array {\n"
+              "                $full = trim($event->fact->place()->gedcomName());\n\n"
+              "                return [\n"
+              "                    'full' => $full,\n"
+              "                    'display' => $this->placeText($event->fact),\n"
+              "                ];\n"
+              "            })\n"
+              "            ->filter(static fn (array $place): bool => $place['full'] !== '')\n"
+              "            ->unique('full')\n"
+              "            ->map(static fn (array $place): string => $place['display'] !== '' ? $place['display'] : $place['full'])\n"
+              "            ->values();\n"
+              "    }\n\n"
+              "    private function placeText(Fact $fact): string\n"
+              "    {\n"
+              "        $full = trim($fact->place()->gedcomName());\n"
+              "        if ($full === '') {\n"
+              "            return '';\n"
+              "        }\n\n"
+              "        $short = $this->plain($fact->place()->shortName());\n\n"
+              "        return $short !== '' ? $short : $full;\n"
+              "    }\n\n"
+          )
           s = replace_once(s, anchor, helper + anchor, 'place helpers')
           p.write_text(s)
 
@@ -92,18 +88,16 @@ jobs:
           s = p.read_text()
           s = replace_once(s, "use Fisharebest\\Webtrees\\Age;\n", "use Fisharebest\\Webtrees\\Age;\nuse Fisharebest\\Webtrees\\Fact;\n", 'Fact import')
           anchor = "$fullName = $nameResolver->formalName($individual);"
-          helper = '''$displayPlace = static function (Fact $fact) use ($plain): string {
-    $full = trim($fact->place()->gedcomName());
-    if ($full === '') {
-        return '';
-    }
-
-    $short = $plain($fact->place()->shortName());
-
-    return $short !== '' ? $short : $full;
-};
-
-'''
+          helper = (
+              "$displayPlace = static function (Fact $fact) use ($plain): string {\n"
+              "    $full = trim($fact->place()->gedcomName());\n"
+              "    if ($full === '') {\n"
+              "        return '';\n"
+              "    }\n\n"
+              "    $short = $plain($fact->place()->shortName());\n\n"
+              "    return $short !== '' ? $short : $full;\n"
+              "};\n\n"
+          )
           s = replace_once(s, anchor, helper + anchor, 'displayPlace helper')
           s = replace_once(s, "$renderEvent = static function (StoryEvent $event) use ($plain, $renderMedia, $renderNotes, $individual): void {", "$renderEvent = static function (StoryEvent $event) use ($plain, $displayPlace, $renderMedia, $renderNotes, $individual): void {", 'render event capture')
           s = replace_once(s, "$place = trim($fact->place()->gedcomName());", "$place = $displayPlace($fact);", 'event card place')
