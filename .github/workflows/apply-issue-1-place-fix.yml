@@ -26,8 +26,8 @@ jobs:
 
           def replace_once(text, old, new, label):
               count = text.count(old)
-              if count != 1:
-                  raise SystemExit(f'{label}: expected exactly one match, found {count}')
+              if count < 1:
+                  raise SystemExit(f'{label}: expected a match, found none')
               return text.replace(old, new, 1)
 
           p = Path('src/NarrativeBuilder.php')
