@@ -67,7 +67,7 @@ final class NarrativeBuilder
 
         if ($birth instanceof StoryEvent) {
             $date = $this->dateText($birth->fact);
-            $place = trim($birth->fact->place()->gedcomName());
+            $place = $this->placeText($birth->fact);
             $knownAs = $this->nameResolver->knownAsPhrase($individual);
             $introducedName = $knownAs !== ''
                 ? I18N::translate('%s, known as %s,', $name, $knownAs)
@@ -102,7 +102,7 @@ final class NarrativeBuilder
 
         if ($death instanceof StoryEvent) {
             $date = $this->dateText($death->fact);
-            $place = trim($death->fact->place()->gedcomName());
+            $place = $this->placeText($death->fact);
             $age = $this->ageAtDeath($birth, $death);
             $sentence = match (true) {
                 $date !== '' && $place !== '' => I18N::translate('%s died %s in %s.', $firstName, $date, $place),
@@ -168,7 +168,7 @@ final class NarrativeBuilder
         $name = $this->nameResolver->formalName($individual);
         $firstName = $this->nameResolver->narrativeName($individual);
         $pronouns = $this->pronouns($individual);
-        $places = $events->map(static fn (StoryEvent $event): string => trim($event->fact->place()->gedcomName()))->filter()->unique()->values();
+        $places = $this->narrativePlaces($events);
         $values = $events->map(fn (StoryEvent $event): string => $this->plain($event->fact->value()))
             ->filter(fn (string $value): bool => $this->useful($value))->unique()->values();
 
@@ -371,7 +371,7 @@ final class NarrativeBuilder
 
     public function groupSummary(string $chapter, Collection $events): string
     {
-        $places = $events->map(static fn (StoryEvent $event): string => trim($event->fact->place()->gedcomName()))->filter()->unique()->values();
+        $places = $this->narrativePlaces($events);
         $values = $events->map(fn (StoryEvent $event): string => $this->plain($event->fact->value()))
             ->filter(fn (string $value): bool => $this->useful($value))->unique()->values();
         $period = $this->periodFromEvents($events);
@@ -468,8 +468,7 @@ final class NarrativeBuilder
             $highlights[] = $text;
         }
 
-        $places = $events->filter(static fn (StoryEvent $event): bool => in_array($event->type, ['RESI', 'CENS'], true))
-            ->map(static fn (StoryEvent $event): string => trim($event->fact->place()->gedcomName()))->filter()->unique()->values();
+        $places = $this->narrativePlaces($events->filter(static fn (StoryEvent $event): bool => in_array($event->type, ['RESI', 'CENS'], true)));
         if ($places->count() >= 2) {
             $highlights[] = I18N::translate('The record identifies %s places called home, including %s.', I18N::number($places->count()), $this->naturalList($places->take(3)->all()));
         }
@@ -530,7 +529,7 @@ final class NarrativeBuilder
 
         $migration = $events->first(static fn (StoryEvent $event): bool => in_array($event->type, ['IMMI', 'EMIG'], true));
         if ($migration instanceof StoryEvent) {
-            $place = trim($migration->fact->place()->gedcomName());
+            $place = $this->placeText($migration->fact);
             $summary = ($place !== ''
                 ? I18N::translate('%s began a new chapter of life in %s.', $name, $place)
                 : I18N::translate('Migration marked a major change in %s life.', $name . '’s')) . $this->ageClause($individual, $migration);
@@ -586,7 +585,7 @@ final class NarrativeBuilder
 
         $death = $events->firstWhere('type', 'DEAT');
         if ($death instanceof StoryEvent) {
-            $place = trim($death->fact->place()->gedcomName());
+            $place = $this->placeText($death->fact);
             $summary = $place !== ''
                 ? I18N::translate('%s life came to a close in %s.', $name . '’s', $place)
                 : I18N::translate('%s final chapter is preserved in the surviving record.', $name . '’s');
@@ -628,7 +627,7 @@ final class NarrativeBuilder
         $birth = $events->firstWhere('type', 'BIRT');
         if ($birth instanceof StoryEvent) {
             $date = $this->dateText($birth->fact);
-            $place = trim($birth->fact->place()->gedcomName());
+            $place = $this->placeText($birth->fact);
             return match (true) {
                 $date !== '' && $place !== '' => I18N::translate('%s story begins %s in %s, where the earliest known chapter of this life was recorded.', $firstName . '’s', $date, $place),
                 $place !== '' => I18N::translate('%s story begins in %s, the place associated with the earliest surviving record.', $firstName . '’s', $place),
@@ -678,7 +677,7 @@ final class NarrativeBuilder
 
             if ($marriage instanceof StoryEvent) {
                 $date = $this->dateText($marriage->fact);
-                $place = trim($marriage->fact->place()->gedcomName());
+                $place = $this->placeText($marriage->fact);
                 $marriageAge = $this->ageAtEvent($individual, $marriage);
                 $lead = $index > 0 ? I18N::translate('Later,') . ' ' : '';
 
@@ -758,7 +757,7 @@ final class NarrativeBuilder
 
             if ($marriage instanceof StoryEvent && $spouseName !== '') {
                 $date = $this->dateText($marriage->fact);
-                $place = trim($marriage->fact->place()->gedcomName());
+                $place = $this->placeText($marriage->fact);
                 $detail = trim(implode(' ', array_filter([$date, $place !== '' ? I18N::translate('in %s', $place) : ''])));
                 $sentence = $index > 0
                     ? ($detail !== ''
@@ -1103,6 +1102,42 @@ final class NarrativeBuilder
             ->flatMap(static fn (Family $family): Collection => $family->children())
             ->unique(static fn (Individual $child): string => $child->xref())
             ->count();
+    }
+
+    /**
+     * Reader-facing place names honour the tree's configured place abbreviation,
+     * while uniqueness/counting continues to use the full GEDCOM place identity.
+     *
+     * @param Collection<int,StoryEvent> $events
+     * @return Collection<int,string>
+     */
+    private function narrativePlaces(Collection $events): Collection
+    {
+        return $events
+            ->map(function (StoryEvent $event): array {
+                $full = trim($event->fact->place()->gedcomName());
+
+                return [
+                    'full' => $full,
+                    'display' => $this->placeText($event->fact),
+                ];
+            })
+            ->filter(static fn (array $place): bool => $place['full'] !== '')
+            ->unique('full')
+            ->map(static fn (array $place): string => $place['display'] !== '' ? $place['display'] : $place['full'])
+            ->values();
+    }
+
+    private function placeText(Fact $fact): string
+    {
+        $full = trim($fact->place()->gedcomName());
+        if ($full === '') {
+            return '';
+        }
+
+        $short = $this->plain($fact->place()->shortName());
+
+        return $short !== '' ? $short : $full;
     }
 
     private function dateText(Fact $fact): string
