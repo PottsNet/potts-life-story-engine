@@ -1,0 +1,121 @@
+name: Apply tested issue 1 place abbreviation fix
+
+on:
+  push:
+    branches:
+      - fix/issue-1-place-abbreviations-rc26
+    paths:
+      - '.github/workflows/apply-issue-1-place-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/issue-1-place-abbreviations-rc26
+      - name: Apply tested place display patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly one match, found {count}')
+              return text.replace(old, new, 1)
+
+          p = Path('src/NarrativeBuilder.php')
+          s = p.read_text()
+          replacements = [
+              ("$place = trim($birth->fact->place()->gedcomName());", "$place = $this->placeText($birth->fact);", 'birth intro'),
+              ("$place = trim($death->fact->place()->gedcomName());", "$place = $this->placeText($death->fact);", 'death intro'),
+              ("$places = $events->map(static fn (StoryEvent $event): string => trim($event->fact->place()->gedcomName()))->filter()->unique()->values();", "$places = $this->narrativePlaces($events);", 'chapter places'),
+              ("$places = $events->map(static fn (StoryEvent $event): string => trim($event->fact->place()->gedcomName()))->filter()->unique()->values();", "$places = $this->narrativePlaces($events);", 'group places'),
+              ("$places = $events->filter(static fn (StoryEvent $event): bool => in_array($event->type, ['RESI', 'CENS'], true))\n            ->map(static fn (StoryEvent $event): string => trim($event->fact->place()->gedcomName()))->filter()->unique()->values();", "$places = $this->narrativePlaces($events->filter(static fn (StoryEvent $event): bool => in_array($event->type, ['RESI', 'CENS'], true)));", 'highlight places'),
+              ("$place = trim($migration->fact->place()->gedcomName());", "$place = $this->placeText($migration->fact);", 'migration'),
+              ("$place = trim($death->fact->place()->gedcomName());", "$place = $this->placeText($death->fact);", 'death turning point'),
+              ("$place = trim($birth->fact->place()->gedcomName());", "$place = $this->placeText($birth->fact);", 'origins'),
+              ("$place = trim($marriage->fact->place()->gedcomName());", "$place = $this->placeText($marriage->fact);", 'marriage narrative'),
+              ("$place = trim($marriage->fact->place()->gedcomName());", "$place = $this->placeText($marriage->fact);", 'family summary'),
+          ]
+          for old, new, label in replacements:
+              s = replace_once(s, old, new, label)
+
+          anchor = "    private function dateText(Fact $fact): string\n    {"
+          helper = '''    /**
+     * Reader-facing place names honour the tree's configured place abbreviation,
+     * while uniqueness/counting continues to use the full GEDCOM place identity.
+     *
+     * @param Collection<int,StoryEvent> $events
+     * @return Collection<int,string>
+     */
+    private function narrativePlaces(Collection $events): Collection
+    {
+        return $events
+            ->map(function (StoryEvent $event): array {
+                $full = trim($event->fact->place()->gedcomName());
+
+                return [
+                    'full' => $full,
+                    'display' => $this->placeText($event->fact),
+                ];
+            })
+            ->filter(static fn (array $place): bool => $place['full'] !== '')
+            ->unique('full')
+            ->map(static fn (array $place): string => $place['display'] !== '' ? $place['display'] : $place['full'])
+            ->values();
+    }
+
+    private function placeText(Fact $fact): string
+    {
+        $full = trim($fact->place()->gedcomName());
+        if ($full === '') {
+            return '';
+        }
+
+        $short = $this->plain($fact->place()->shortName());
+
+        return $short !== '' ? $short : $full;
+    }
+
+'''
+          s = replace_once(s, anchor, helper + anchor, 'place helpers')
+          p.write_text(s)
+
+          p = Path('resources/views/tab.phtml')
+          s = p.read_text()
+          s = replace_once(s, "use Fisharebest\\Webtrees\\Age;\n", "use Fisharebest\\Webtrees\\Age;\nuse Fisharebest\\Webtrees\\Fact;\n", 'Fact import')
+          anchor = "$fullName = $nameResolver->formalName($individual);"
+          helper = '''$displayPlace = static function (Fact $fact) use ($plain): string {
+    $full = trim($fact->place()->gedcomName());
+    if ($full === '') {
+        return '';
+    }
+
+    $short = $plain($fact->place()->shortName());
+
+    return $short !== '' ? $short : $full;
+};
+
+'''
+          s = replace_once(s, anchor, helper + anchor, 'displayPlace helper')
+          s = replace_once(s, "$renderEvent = static function (StoryEvent $event) use ($plain, $renderMedia, $renderNotes, $individual): void {", "$renderEvent = static function (StoryEvent $event) use ($plain, $displayPlace, $renderMedia, $renderNotes, $individual): void {", 'render event capture')
+          s = replace_once(s, "$place = trim($fact->place()->gedcomName());", "$place = $displayPlace($fact);", 'event card place')
+          s = replace_once(s, "$featuredPlace = trim($featuredFact->place()->gedcomName());", "$featuredPlace = $displayPlace($featuredFact);", 'featured place')
+          p.write_text(s)
+          PY
+
+          php -l src/NarrativeBuilder.php
+          php -l resources/views/tab.phtml
+          rm -f .github/workflows/apply-issue-1-place-fix.yml
+          git config user.name "PottsNet"
+          git config user.email "42736500+PottsNet@users.noreply.github.com"
+          git add -A
+          git commit -m "Respect webtrees place abbreviation in biography text"
+          git push origin HEAD:fix/issue-1-place-abbreviations-rc26
